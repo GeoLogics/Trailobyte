@@ -28,4 +28,8 @@ public class Trail {
 	public void addLast(Marker marker) {
 		end = marker;
 	}
+	
+	public int getNumberMarkers() {
+		return markers.size();
+	}
 }
