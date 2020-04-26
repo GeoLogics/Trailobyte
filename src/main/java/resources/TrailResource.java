@@ -16,6 +16,7 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.PathElement;
+import com.google.cloud.datastore.Transaction;
 import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
 
@@ -48,73 +49,94 @@ public class TrailResource {
 			markers.add(trail.markers.get(i));
 		}*/
 		
-		Key trailKey = trailKeyFactory.newKey(trail.name);
-		Entity trailEntity = Entity.newBuilder(trailKey)
-				.set("Name", trail.name)
-				.set("NumberMarkers", trail.getNumberMarkers())
-				.build();
-		
-		Key startKey = datastore.newKeyFactory()
-				.addAncestor(PathElement.of("Trail", trail.name))
-				.setKind("Start")
-				.newKey(trail.name);
-		
-		Entity startEntity = Entity.newBuilder(startKey)
-				.set("Lat", trail.start.lat)
-				.set("Lng", trail.start.lng)
-				.set("Type", trail.start.type)
-				.set("Description", trail.start.description)
-				.build();
-		
-		Key endKey = datastore.newKeyFactory()
-				.addAncestor(PathElement.of("Trail", trail.name))
-				.setKind("End")
-				.newKey(trail.name);
-		
-		Entity endEntity = Entity.newBuilder(endKey)
-				.set("Lat", trail.end.lat)
-				.set("Lng", trail.end.lng)
-				.set("Type", trail.end.type)
-				.set("Description", trail.end.description)
-				.build();
-		
-		/*Entity trailEntity1 = Entity.newBuilder(trailKey)
-				.set("Name", trail.name)
-				.set("Start", startEntity)
-				.set("End", endEntity)
-				.build();
-		*/
-		
-		datastore.add(trailEntity);
-		datastore.add(startEntity);
-		datastore.add(endEntity);
-		
-		for(int i =0; i < trail.markers.size(); i++) {
+		Transaction txn = datastore.newTransaction();
+		try {
+			Key trailKey = trailKeyFactory.newKey(trail.name);
+			Entity trailEntity = Entity.newBuilder(trailKey)
+					.set("name", trail.name)
+					.set("start", g.toJson(trail.start))
+					.set("end", g.toJson(trail.end))
+					.set("markers", g.toJson(trail.markers))
+					.set("description", trail.description)
+					.set("trailImg", trail.trailImg)
+					.set("dist", trail.dist)
+					.build();
 			
-			Key markerKey = datastore.newKeyFactory()
+			txn.put(trailEntity);
+			txn.commit();
+			return Response.ok("{}").build();
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(txn.isActive())
+				txn.rollback();
+		}
+		return null;
+		
+			
+			
+			/*Key startKey = datastore.newKeyFactory()
 					.addAncestor(PathElement.of("Trail", trail.name))
-					.setKind("Marker")
-					.newKey(trail.markers.get(i).id);
+					.setKind("Start")
+					.newKey(trail.name);
 			
-			Entity markerEntity = Entity.newBuilder(markerKey)
-					.set("ID", trail.markers.get(i).id)
+			Entity startEntity = Entity.newBuilder(startKey)
+					.set("Lat", trail.start.lat)
+					.set("Lng", trail.start.lng)
+					.set("Type", trail.start.type)
+					.set("Description", trail.start.content)
+					.build();
+			
+			Key endKey = datastore.newKeyFactory()
+					.addAncestor(PathElement.of("Trail", trail.name))
+					.setKind("End")
+					.newKey(trail.name);
+			
+			Entity endEntity = Entity.newBuilder(endKey)
 					.set("Lat", trail.end.lat)
 					.set("Lng", trail.end.lng)
 					.set("Type", trail.end.type)
-					.set("Description", trail.end.description)
+					.set("Description", trail.end.content)
 					.build();
 			
-			datastore.add(markerEntity);
-		}
+			/*Entity trailEntity1 = Entity.newBuilder(trailKey)
+					.set("Name", trail.name)
+					.set("Start", startEntity)
+					.set("End", endEntity)
+					.build();
+			*/
+			
+			
+			
+			/*
+			for(int i =0; i < trail.markers.size(); i++) {
+				
+				Key markerKey = datastore.newKeyFactory()
+						.addAncestor(PathElement.of("Trail", trail.name))
+						.setKind("Marker")
+						.newKey(trail.markers.get(i).id);
+				
+				Entity markerEntity = Entity.newBuilder(markerKey)
+						.set("ID", trail.markers.get(i).id)
+						.set("Lat", trail.end.lat)
+						.set("Lng", trail.end.lng)
+						.set("Type", trail.end.type)
+						.set("Description", trail.end.content)
+						.build();
+				
+				datastore.add(markerEntity);
+			}*/
 		
 
 		
 		
-		return Response.ok("{}").build();
+		
 	}
 	
 	
-	@POST
+	/*@POST
 	@Path("/get")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getTrail(String trailName) {
@@ -194,5 +216,5 @@ public class TrailResource {
 		trail.addMarker(End);
 		
 		return Response.ok(g.toJson(trail)).build();
-	}
+	}*/
 }

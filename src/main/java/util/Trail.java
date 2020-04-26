@@ -2,18 +2,30 @@ package util;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.cloud.datastore.Key;
 
 public class Trail {
 	
-	public List<Marker> markers;
 	public String name;
 	public Marker start;
 	public Marker end;
+	public List<Marker> markers;
+	public String description;
+	public String trailImg;
+	public double dist;
 	
-	public Trail(String name) {
+	public Trail() {}
+	
+	
+	public Trail(String name, String description, String trailImg, double dist, List<Marker> markers) {
 		
-		this.markers = new ArrayList<Marker>();
-		this.name=name;
+		this.name= name;
+		this.description = description;
+		this.trailImg = trailImg;
+		this.dist = dist; 
+		this.markers = markers;
+		this.start = markers.get(0);
+		this.end = markers.get(markers.size()-1);
 		
 	}
 
