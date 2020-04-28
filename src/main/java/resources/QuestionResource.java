@@ -17,6 +17,8 @@ import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
+import util.QuestionListQuestionsTF;
+import util.QuestionListAnswerTF;
 import util.QuestionMultipleChoise;
 import util.QuestionOrder;
 import util.QuestionTrueOrFalse;
@@ -44,7 +46,7 @@ public class QuestionResource {
 		Transaction txn = datastore.newTransaction();
 		try {
 			Key questionKey = questionKeyFactory.newKey(question.id);
-			Entity trailEntity = Entity.newBuilder(questionKey)
+			Entity questionMCEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question",question.question)
 					.set("optionA", question.optionA)
@@ -54,7 +56,7 @@ public class QuestionResource {
 					.set("correctOption", question.correctOption)
 					.build();
 			
-			txn.put(trailEntity);
+			txn.put(questionMCEntity);
 			txn.commit();
 			return Response.ok("postQMC").build();
 			
@@ -116,14 +118,14 @@ public class QuestionResource {
 		Transaction txn = datastore.newTransaction();
 		try {
 			Key questionKey = questionKeyFactory.newKey(question.id);
-			Entity trailEntity = Entity.newBuilder(questionKey)
+			Entity questionQOEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question", question.question)
 					.set("options", g.toJson(question.options))
 					.set("order", g.toJson(question.order))
 					.build();
 			
-			txn.put(trailEntity);
+			txn.put(questionQOEntity);
 			txn.commit();
 			return Response.ok("postQO").build();
 			
@@ -179,13 +181,14 @@ public class QuestionResource {
 		Transaction txn = datastore.newTransaction();
 		try {
 			Key questionKey = questionKeyFactory.newKey(question.id);
-			Entity trailEntity = Entity.newBuilder(questionKey)
+			Entity questionTFEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
-					.set("questions", g.toJson(question.questions))
-					.set("answers", g.toJson(question.answers))
+					.set("questions", g.toJson(question.questionsList))
+					.set("answers", g.toJson(question.answersList))
+					.set("numberOfQuestions", question.numberOfQuestions)
 					.build();
 			
-			txn.put(trailEntity);
+			txn.put(questionTFEntity);
 			txn.commit();
 			return Response.ok("postQTF").build();
 			
@@ -216,10 +219,15 @@ public class QuestionResource {
 			String enunciated = questionTFEntity.getString("enunciated");
 			String questionsS = questionTFEntity.getString("questions");
 			String answers = questionTFEntity.getString("answers");
+			int numberOfQuestions = (int) questionTFEntity.getLong("numberOfQuestions");
+			
+			//Gson g = new Gson(); 
+			QuestionListQuestionsTF questions = g.fromJson(questionsS, QuestionListQuestionsTF.class);
+			QuestionListAnswerTF answersList = g.fromJson(answers, QuestionListAnswerTF.class);
 			
 			QuestionTrueOrFalse question = new QuestionTrueOrFalse(
-					enunciated, questionsS,
-					answers, id);
+					enunciated, questions, numberOfQuestions,
+					answersList, id);
 			
 			return Response.ok(g.toJson(question)).build();
 			
