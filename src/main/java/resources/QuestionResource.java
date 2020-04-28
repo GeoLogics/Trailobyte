@@ -1,6 +1,10 @@
 package resources;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -18,11 +22,13 @@ import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
-import util.QuestionListQuestionsTF;
-import util.QuestionListAnswerTF;
-import util.QuestionMultipleChoise;
-import util.QuestionOrder;
-import util.QuestionTrueOrFalse;
+import util.Questions.QuestionListAnswerTF;
+import util.Questions.QuestionListOptionsQO;
+import util.Questions.QuestionListOrderQO;
+import util.Questions.QuestionListQuestionsTF;
+import util.Questions.QuestionMultipleChoise;
+import util.Questions.QuestionOrder;
+import util.Questions.QuestionTrueOrFalse;
 
 
 
@@ -31,13 +37,41 @@ import util.QuestionTrueOrFalse;
 public class QuestionResource {
 	
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-	private final KeyFactory questionKeyFactory = datastore.newKeyFactory().setKind("Question");
+	private final KeyFactory questionQMCKeyFactory = datastore.newKeyFactory().setKind("QuestionQMC");
+	private final KeyFactory questionQOKeyFactory = datastore.newKeyFactory().setKind("QuestionQO");
+	private final KeyFactory questionQTFKeyFactory = datastore.newKeyFactory().setKind("QuestionQTF");
+
 	
 	private final Gson g = new Gson();
 	
 	public QuestionResource() {
 		
 	}
+	
+	/*@GET
+	@Path("/getRandom")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response getQuestionsAtRandom() {
+		
+		/*List<String> types = new ArrayList<String>();
+		
+		types.add("QMC");
+		types.add("QO");
+		types.add("QTF");*/
+		
+		/*Random rand = new Random();
+		
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+
+		
+		return null;
+	}*/
+	
 	
 	@POST
 	@Path("/postQMC")
@@ -46,7 +80,7 @@ public class QuestionResource {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionKeyFactory.newKey(question.id);
+			Key questionKey = questionQMCKeyFactory.newKey(question.id);
 			Entity questionMCEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question",question.question)
@@ -73,13 +107,13 @@ public class QuestionResource {
 	
 	
 	@GET
-	@Path("/getQMC")
+	@Path("/getQMC/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getQuestionMultipleChoise(int id) {
+	public Response getQuestionMultipleChoise(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionKeyFactory.newKey(id);
+			Key questionKey = questionQMCKeyFactory.newKey(id);
 			
 			Entity questionMCEntity = datastore.get(questionKey);
 			
@@ -118,12 +152,12 @@ public class QuestionResource {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionKeyFactory.newKey(question.id);
+			Key questionKey = questionQOKeyFactory.newKey(question.id);
 			Entity questionQOEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question", question.question)
 					.set("options", g.toJson(question.options))
-					.set("order", g.toJson(question.order))
+					.set("byOrder", g.toJson(question.byOrder))
 					.build();
 			
 			txn.put(questionQOEntity);
@@ -142,24 +176,29 @@ public class QuestionResource {
 	
 	
 	@GET
-	@Path("/getQO")
+	@Path("/getQO/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getQuestionOrder(int id) {
+	public Response getQuestionOrder(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionKeyFactory.newKey(id);
+			Key questionKey = questionQOKeyFactory.newKey(id);
 			
 			Entity questionOEntity = datastore.get(questionKey);
 			
 			String enunciated = questionOEntity.getString("enunciated");
 			String questionS = questionOEntity.getString("question");
-			String options = questionOEntity.getString("options");
-			String order = questionOEntity.getString("order");
+			String optionsS = questionOEntity.getString("options");
+			String byOrderS = questionOEntity.getString("byOrder");
 			
+
+			
+			QuestionListOptionsQO options = g.fromJson(optionsS, QuestionListOptionsQO.class);
+			QuestionListOrderQO byOrder = g.fromJson(byOrderS, QuestionListOrderQO.class);
+	
 			QuestionOrder question = new QuestionOrder(
 					enunciated, questionS,
-					options, order, id);
+					options, byOrder, id);
 			
 			return Response.ok(g.toJson(question)).build();
 			
@@ -181,7 +220,7 @@ public class QuestionResource {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionKeyFactory.newKey(question.id);
+			Key questionKey = questionQTFKeyFactory.newKey(question.id);
 			Entity questionTFEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("questions", g.toJson(question.questionsList))
@@ -213,7 +252,7 @@ public class QuestionResource {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionKeyFactory.newKey(id);
+			Key questionKey = questionQTFKeyFactory.newKey(id);
 			
 			Entity questionTFEntity = datastore.get(questionKey);
 			
