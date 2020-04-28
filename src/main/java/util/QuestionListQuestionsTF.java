@@ -2,12 +2,16 @@ package util;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class QuestionListQuestionsTF {
 	
-	public List<String> question;
+	public List<String> questions;
 	
-	public QuestionListQuestionsTF(List<String> question) {
-		this.question=question;
+	@JsonCreator
+	public QuestionListQuestionsTF(@JsonProperty("questions") List<String> questions) {
+		this.questions=questions;
 	}
 
 }
