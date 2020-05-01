@@ -32,23 +32,23 @@ import util.Questions.QuestionTrueOrFalse;
 
 
 
-@Path("/question")
+@Path("/TempQuestion")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class QuestionResource {
+public class TempQuestionResource {
 	
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-	private final KeyFactory questionQMCKeyFactory = datastore.newKeyFactory().setKind("QuestionQMC");
-	private final KeyFactory questionQOKeyFactory = datastore.newKeyFactory().setKind("QuestionQO");
-	private final KeyFactory questionQTFKeyFactory = datastore.newKeyFactory().setKind("QuestionQTF");
+	private final KeyFactory questionTempQMCKeyFactory = datastore.newKeyFactory().setKind("TempQuestionQMC");
+	private final KeyFactory questionTempQOKeyFactory = datastore.newKeyFactory().setKind("TempQuestionQO");
+	private final KeyFactory questionTempQTFKeyFactory = datastore.newKeyFactory().setKind("TempQuestionQTF");
 	
-	private final KeyFactory questionsLastIDKeyFactory = datastore.newKeyFactory().setKind("QuestionsLastID");
+	private final KeyFactory questionsTempLastIDKeyFactory = datastore.newKeyFactory().setKind("TempQuestionsLastID");
 	/*private final KeyFactory questionQOIDKeyFactory = datastore.newKeyFactory().setKind("QOLastID");
 	private final KeyFactory questionQTFIDKeyFactory = datastore.newKeyFactory().setKind("QTFLastID");*/
 
 	
 	private final Gson g = new Gson();
 	
-	public QuestionResource() {
+	public TempQuestionResource() {
 		
 	}
 	
@@ -77,16 +77,15 @@ public class QuestionResource {
 	}*/
 	
 	
-	
 	/*
 	@POST
 	@Path("/postQMCID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postQuestionMultipleChoiseID(@PathParam("id") int id) {
+	public Response postTempQuestionMultipleChoiseID(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key QMCIDKey = questionsLastIDKeyFactory.newKey("QMCID");
+			Key QMCIDKey = questionsTempLastIDKeyFactory.newKey("QMCID");
 			Entity QMCIDEntity = Entity.newBuilder(QMCIDKey)
 					.set("LastID", id)
 					.build();
@@ -108,11 +107,11 @@ public class QuestionResource {
 	@POST
 	@Path("/postQOID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postQuestionOrderID(@PathParam("id") int id) {
+	public Response postTempQuestionOrderID(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key QOIDKey = questionsLastIDKeyFactory.newKey("QOID");
+			Key QOIDKey = questionsTempLastIDKeyFactory.newKey("QOID");
 			Entity QOIDEntity = Entity.newBuilder(QOIDKey)
 					.set("LastID", id)
 					.build();
@@ -134,11 +133,11 @@ public class QuestionResource {
 	@POST
 	@Path("/postQTFID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postQuestionTrueOrFalseID(@PathParam("id") int id) {
+	public Response postTempQuestionTrueOrFalseID(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key QTFIDKey = questionsLastIDKeyFactory.newKey("QTFID");
+			Key QTFIDKey = questionsTempLastIDKeyFactory.newKey("QTFID");
 			Entity QTFIDEntity = Entity.newBuilder(QTFIDKey)
 					.set("LastID", id)
 					.build();
@@ -161,24 +160,24 @@ public class QuestionResource {
 	@POST
 	@Path("/postQMC")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postQuestionMultipleChoise(QuestionMultipleChoise question) {
+	public Response postTempQuestionMultipleChoise(QuestionMultipleChoise question) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
 			
-			Key idKey = questionsLastIDKeyFactory.newKey("QMCID");
+			Key idKey = questionsTempLastIDKeyFactory.newKey("QMCID");
 			
 			Entity questionLastIDEntity = datastore.get(idKey);
 			
 			int idFDB = (int) questionLastIDEntity.getLong("LastID");
 			idFDB++;
 			
-			Key QMCIDKey = questionsLastIDKeyFactory.newKey("QMCID");
+			Key QMCIDKey = questionsTempLastIDKeyFactory.newKey("QMCID");
 			Entity QMCIDEntity = Entity.newBuilder(QMCIDKey)
 					.set("LastID", idFDB)
 					.build();
 			
-			Key questionKey = questionQMCKeyFactory.newKey(idFDB);
+			Key questionKey = questionTempQMCKeyFactory.newKey(idFDB);
 			Entity questionMCEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question",question.question)
@@ -207,11 +206,11 @@ public class QuestionResource {
 	@GET
 	@Path("/getQMC/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getQuestionMultipleChoise(@PathParam("id") int id) {
+	public Response getTempQuestionMultipleChoise(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionQMCKeyFactory.newKey(id);
+			Key questionKey = questionTempQMCKeyFactory.newKey(id);
 			
 			Entity questionMCEntity = datastore.get(questionKey);
 			
@@ -246,27 +245,27 @@ public class QuestionResource {
 	@POST
 	@Path("/postQO")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postQuestionOrder(QuestionOrder question) {
+	public Response postTempQuestionOrder(QuestionOrder question) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
 			
 			
-			Key idKey = questionsLastIDKeyFactory.newKey("QOID");
+			Key idKey = questionsTempLastIDKeyFactory.newKey("QOID");
 			
 			Entity questionLastIDEntity = datastore.get(idKey);
 			
 			int idFDB = (int) questionLastIDEntity.getLong("LastID");
 			idFDB++;
 			
-			Key QOIDKey = questionsLastIDKeyFactory.newKey("QOID");
+			Key QOIDKey = questionsTempLastIDKeyFactory.newKey("QOID");
 			Entity QOIDEntity = Entity.newBuilder(QOIDKey)
 					.set("LastID", idFDB)
 					.build();
 			
 			
 			
-			Key questionKey = questionQOKeyFactory.newKey(idFDB);
+			Key questionKey = questionTempQOKeyFactory.newKey(idFDB);
 			Entity questionQOEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question", question.question)
@@ -292,11 +291,11 @@ public class QuestionResource {
 	@GET
 	@Path("/getQO/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getQuestionOrder(@PathParam("id") int id) {
+	public Response getTempQuestionOrder(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionQOKeyFactory.newKey(id);
+			Key questionKey = questionTempQOKeyFactory.newKey(id);
 			
 			Entity questionOEntity = datastore.get(questionKey);
 			
@@ -330,26 +329,26 @@ public class QuestionResource {
 	@POST
 	@Path("/postQTF")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postQuestionTrueOrFalse(QuestionTrueOrFalse question) {
+	public Response postTempQuestionTrueOrFalse(QuestionTrueOrFalse question) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
 			
 			
-			Key idKey = questionsLastIDKeyFactory.newKey("QTFID");
+			Key idKey = questionsTempLastIDKeyFactory.newKey("QTFID");
 			
 			Entity questionLastIDEntity = datastore.get(idKey);
 			
 			int idFDB = (int) questionLastIDEntity.getLong("LastID");
 			idFDB++;
 			
-			Key QTFIDKey = questionsLastIDKeyFactory.newKey("QTFID");
+			Key QTFIDKey = questionsTempLastIDKeyFactory.newKey("QTFID");
 			Entity QTFIDEntity = Entity.newBuilder(QTFIDKey)
 					.set("LastID", idFDB)
 					.build();
 			
 			
-			Key questionKey = questionQTFKeyFactory.newKey(idFDB);
+			Key questionKey = questionTempQTFKeyFactory.newKey(idFDB);
 			Entity questionTFEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question", question.question)
@@ -378,11 +377,11 @@ public class QuestionResource {
 	@GET
 	@Path("/getQTF/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getQuestionTrueOrFalse(@PathParam("id") int id) {
+	public Response getTempQuestionTrueOrFalse(@PathParam("id") int id) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionQTFKeyFactory.newKey(id);
+			Key questionKey = questionTempQTFKeyFactory.newKey(id);
 			
 			Entity questionTFEntity = datastore.get(questionKey);
 			
