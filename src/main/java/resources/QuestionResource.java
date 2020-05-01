@@ -40,6 +40,10 @@ public class QuestionResource {
 	private final KeyFactory questionQMCKeyFactory = datastore.newKeyFactory().setKind("QuestionQMC");
 	private final KeyFactory questionQOKeyFactory = datastore.newKeyFactory().setKind("QuestionQO");
 	private final KeyFactory questionQTFKeyFactory = datastore.newKeyFactory().setKind("QuestionQTF");
+	
+	private final KeyFactory questionsLastIDKeyFactory = datastore.newKeyFactory().setKind("QuestionsLastID");
+	/*private final KeyFactory questionQOIDKeyFactory = datastore.newKeyFactory().setKind("QOLastID");
+	private final KeyFactory questionQTFIDKeyFactory = datastore.newKeyFactory().setKind("QTFLastID");*/
 
 	
 	private final Gson g = new Gson();
@@ -72,6 +76,84 @@ public class QuestionResource {
 		return null;
 	}*/
 	
+	/*@POST
+	@Path("/postQMCID/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response postQuestionMultipleChoiseID(@PathParam("id") int id) {
+		
+		Transaction txn = datastore.newTransaction();
+		try {
+			Key QMCIDKey = questionsLastIDKeyFactory.newKey("QMCID");
+			Entity QMCIDEntity = Entity.newBuilder(QMCIDKey)
+					.set("LastID", id)
+					.build();
+			
+			txn.put(QMCIDEntity);
+			txn.commit();
+			return Response.ok("postQMCID").build();
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(txn.isActive())
+				txn.rollback();
+		}
+		return null;
+	}
+	
+	@POST
+	@Path("/postQOID/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response postQuestionOrderID(@PathParam("id") int id) {
+		
+		Transaction txn = datastore.newTransaction();
+		try {
+			Key QOIDKey = questionsLastIDKeyFactory.newKey("QOID");
+			Entity QOIDEntity = Entity.newBuilder(QOIDKey)
+					.set("LastID", id)
+					.build();
+			
+			txn.put(QOIDEntity);
+			txn.commit();
+			return Response.ok("postQOID").build();
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(txn.isActive())
+				txn.rollback();
+		}
+		return null;
+	}
+	
+	@POST
+	@Path("/postQTFID/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response postQuestionTrueOrFalseID(@PathParam("id") int id) {
+		
+		Transaction txn = datastore.newTransaction();
+		try {
+			Key QTFIDKey = questionsLastIDKeyFactory.newKey("QTFID");
+			Entity QTFIDEntity = Entity.newBuilder(QTFIDKey)
+					.set("LastID", id)
+					.build();
+			
+			txn.put(QTFIDEntity);
+			txn.commit();
+			return Response.ok("postQTFID").build();
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(txn.isActive())
+				txn.rollback();
+		}
+		return null;
+	}
+	*/
 	
 	@POST
 	@Path("/postQMC")
@@ -80,7 +162,20 @@ public class QuestionResource {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionQMCKeyFactory.newKey(question.id);
+			
+			Key idKey = questionsLastIDKeyFactory.newKey("QMCID");
+			
+			Entity questionLastIDEntity = datastore.get(idKey);
+			
+			int idFDB = (int) questionLastIDEntity.getLong("LastID");
+			idFDB++;
+			
+			Key QMCIDKey = questionsLastIDKeyFactory.newKey("QMCID");
+			Entity QMCIDEntity = Entity.newBuilder(QMCIDKey)
+					.set("LastID", idFDB)
+					.build();
+			
+			Key questionKey = questionQMCKeyFactory.newKey(idFDB);
 			Entity questionMCEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question",question.question)
@@ -91,7 +186,7 @@ public class QuestionResource {
 					.set("correctOption", question.correctOption)
 					.build();
 			
-			txn.put(questionMCEntity);
+			txn.put(questionMCEntity, QMCIDEntity);
 			txn.commit();
 			return Response.ok("postQMC").build();
 			
@@ -152,7 +247,23 @@ public class QuestionResource {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionQOKeyFactory.newKey(question.id);
+			
+			
+			Key idKey = questionsLastIDKeyFactory.newKey("QOID");
+			
+			Entity questionLastIDEntity = datastore.get(idKey);
+			
+			int idFDB = (int) questionLastIDEntity.getLong("LastID");
+			idFDB++;
+			
+			Key QOIDKey = questionsLastIDKeyFactory.newKey("QOID");
+			Entity QOIDEntity = Entity.newBuilder(QOIDKey)
+					.set("LastID", idFDB)
+					.build();
+			
+			
+			
+			Key questionKey = questionQOKeyFactory.newKey(idFDB);
 			Entity questionQOEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
 					.set("question", question.question)
@@ -160,7 +271,7 @@ public class QuestionResource {
 					.set("byOrder", g.toJson(question.byOrder))
 					.build();
 			
-			txn.put(questionQOEntity);
+			txn.put(questionQOEntity, QOIDEntity);
 			txn.commit();
 			return Response.ok("postQO").build();
 			
@@ -220,15 +331,31 @@ public class QuestionResource {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
-			Key questionKey = questionQTFKeyFactory.newKey(question.id);
+			
+			
+			Key idKey = questionsLastIDKeyFactory.newKey("QTFID");
+			
+			Entity questionLastIDEntity = datastore.get(idKey);
+			
+			int idFDB = (int) questionLastIDEntity.getLong("LastID");
+			idFDB++;
+			
+			Key QTFIDKey = questionsLastIDKeyFactory.newKey("QTFID");
+			Entity QTFIDEntity = Entity.newBuilder(QTFIDKey)
+					.set("LastID", idFDB)
+					.build();
+			
+			
+			Key questionKey = questionQTFKeyFactory.newKey(idFDB);
 			Entity questionTFEntity = Entity.newBuilder(questionKey)
 					.set("enunciated", question.enunciated)
+					.set("question", question.question)
 					.set("questions", g.toJson(question.questionsList))
 					.set("answers", g.toJson(question.answersList))
 					.set("numberOfQuestions", question.numberOfQuestions)
 					.build();
 			
-			txn.put(questionTFEntity);
+			txn.put(questionTFEntity, QTFIDEntity);
 			txn.commit();
 			return Response.ok("postQTF").build();
 			
@@ -257,6 +384,7 @@ public class QuestionResource {
 			Entity questionTFEntity = datastore.get(questionKey);
 			
 			String enunciated = questionTFEntity.getString("enunciated");
+			String questionS = questionTFEntity.getString("question");
 			String questionsS = questionTFEntity.getString("questions");
 			String answers = questionTFEntity.getString("answers");
 			int numberOfQuestions = (int) questionTFEntity.getLong("numberOfQuestions");
@@ -266,7 +394,7 @@ public class QuestionResource {
 			QuestionListAnswerTF answersList = g.fromJson(answers, QuestionListAnswerTF.class);
 			
 			QuestionTrueOrFalse question = new QuestionTrueOrFalse(
-					enunciated, questions, numberOfQuestions,
+					enunciated, questionS, questions, numberOfQuestions,
 					answersList, id);
 			
 			return Response.ok(g.toJson(question)).build();

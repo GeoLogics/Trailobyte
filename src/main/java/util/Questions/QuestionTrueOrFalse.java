@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class QuestionTrueOrFalse {
 
 	public String enunciated;
+	public String question;
 	public QuestionListQuestionsTF questionsList;
 	public QuestionListAnswerTF answersList;
 	public int id;
@@ -16,12 +17,14 @@ public class QuestionTrueOrFalse {
 	
 	 @JsonCreator
 	public QuestionTrueOrFalse(@JsonProperty("enunciated") String enunciated, 
+								@JsonProperty("question") String question,
 								@JsonProperty("questions") QuestionListQuestionsTF questions, 
 								@JsonProperty("numberOfQuestions") int numberOfQuestions,  
 								@JsonProperty("answers") QuestionListAnswerTF answers,
 								@JsonProperty("id") int id) {
 		
 		this.enunciated=enunciated;
+		this.question=question;
 		this.numberOfQuestions=numberOfQuestions;
 		questionsList = questions;
 		answersList = answers;
