@@ -1,15 +1,53 @@
 package resources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -19,17 +57,31 @@ import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.Transaction;
 import com.google.cloud.datastore.Value;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 
 import util.Marker;
 import util.RegisterData;
 import util.Trail;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+
+
 @Path("/trail")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class TrailResource {
 
+	//A Logger Object
+	private static final Logger LOGGER = Logger.getLogger(LoginResource.class.getName());
 	
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+	private final Storage storage = StorageOptions.newBuilder().setProjectId("trailobyte-275015").build().getService();
 	private final KeyFactory trailKeyFactory = datastore.newKeyFactory().setKind("Trail");
 	
 	private final Gson g = new Gson();
@@ -38,183 +90,213 @@ public class TrailResource {
 		
 	}
 	
+	
+
+	
+	@SuppressWarnings("deprecation")
 	@POST
-	@Path("/post")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postTrail(Trail trail) {
+	@Path("/postimage")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public Response postImage(@Context HttpServletRequest req, @Context HttpServletResponse res)  throws ServletException, IOException, FileUploadException {
 		
-		/*List<Marker> markers = new ArrayList<Marker>();
-		
-		for(int i=0; i < trail.markers.size() + 2; i++) {
-			markers.add(trail.markers.get(i));
-		}*/
-		
-		Transaction txn = datastore.newTransaction();
-		try {
-			Key trailKey = trailKeyFactory.newKey(trail.name);
-			Entity trailEntity = Entity.newBuilder(trailKey)
+		 ServletFileUpload upload = new ServletFileUpload();
+         FileItemIterator iterator = upload.getItemIterator(req);
+         
+        
+         Trail trail = null;
+         Key trailKey = null;
+         Transaction txn = null;
+         FileItemStream item;
+         String markersMediaLink = "";
+         
+               
+         try {
+             
+			 while(iterator.hasNext()) {
+	        	 item = iterator.next();
+	        	 InputStream stream = item.openStream();
+	        	 if(item.isFormField()) {
+	        		JsonParser jsonParser = new JsonParser();
+	        		JsonObject jsonObject = (JsonObject)jsonParser.parse(new InputStreamReader(item.openStream(), "UTF-8"));
+	        		trail = g.fromJson(jsonObject, Trail.class);
+	        		trailKey = trailKeyFactory.newKey(trail.name);
+	        		if(datastore.get(trailKey) != null)
+						return null;
+	        		
+	        		//store markers list
+	        		BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/ "+ trail.name +"/"+"markers.json");
+     	        	BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+     	        	//String saveMarkers = "{\"markers\":"+ g.toJson(trail.markers).toString() +"}";
+     	        	markersMediaLink = storage.create(blobInfo, g.toJson(trail.markers).toString().getBytes()).getMediaLink();
+     				
+	        	 }
+	        		 
+	        	 else {
+	        		//store trail's image
+	        		 if(item.getName().equals(trail.name)) {
+	        			 BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/" + item.getName());
+		 	     	     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+		 	     			
+		 	     		 //saves image's storage URL to trailImg in the trail (the trailImg comes with picture_name.jpg or null)
+		 	     	     if(trail.trailImg !=null && trail.trailImg.equals(item.getName()))
+		 	     	    	trail.trailImg = storage.create(blobInfo, toByteArray(stream)).getMediaLink();
+	        		 }else {
+	        			//store marker's images 
+	 	        		BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/pictures/" + item.getName());
+	 	     	        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+	 	     			
+	 	     			//saves image's storage URL to imgURL in the marker (the imgURL comes with picture_name.jpg or null)
+	 	     			for(Marker aux : trail.markers)
+	 	     				if(aux.imgURL !=null && aux.imgURL.equals(item.getName()))
+	 	     					aux.imgURL = storage.create(blobInfo, toByteArray(stream)).getMediaLink();
+	        		 }	        		
+	        	 }	 
+			 }
+			 txn = datastore.newTransaction();
+			 
+			 Entity trailEntity = Entity.newBuilder(trailKey)
 					.set("name", trail.name)
-					.set("start", g.toJson(trail.start))
-					.set("end", g.toJson(trail.end))
-					.set("markers", g.toJson(trail.markers))
 					.set("description", trail.description)
 					.set("trailImg", trail.trailImg)
+					.set("creator", trail.creator)
+					
+					.set("markers", markersMediaLink )
+					.set("start", trail.markers.get(0).name)
+					.set("end", trail.markers.get(trail.markers.size()-1).name)
+					
+					.set("avgRating", trail.avgRating)
+					.set("nRatings", trail.nRatings)
 					.set("dist", trail.dist)
+					
+					.set("verified", trail.verified)
 					.build();
-			
+							
 			txn.put(trailEntity);
 			txn.commit();
 			return Response.ok("{}").build();
-			
-		}catch(Exception e) {
-			e.printStackTrace();
+					
+		 }catch(Exception e) {
+				e.printStackTrace();
 		}
 		finally{
 			if(txn.isActive())
 				txn.rollback();
 		}
-		return null;
+	    return null;
+	   }
+	
+	
+	
+	
+	
+	
+	
+	//from:https://www.techiedelight.com/convert-inputstream-byte-array-java/
+	private static byte[] toByteArray(InputStream in) throws IOException {
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+		byte[] buffer = new byte[1024];
+		int len;
+
+		// read bytes from the input stream and store them in buffer
+		while ((len = in.read(buffer)) != -1) {
+			// write bytes from the buffer into output stream
+			os.write(buffer, 0, len);
+		}
+
+		return os.toByteArray();
+	}
+	
+	
+	@GET
+	@Path("/get/{trailName}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTrail(@PathParam("trailName")String trailName) throws JsonMappingException, JsonProcessingException {
 		
+		try {
+			Key trailKey = trailKeyFactory.newKey(trailName);
+			Entity trailEntity = datastore.get(trailKey);
+			if(trailEntity == null)
+				return Response.status(Status.NOT_FOUND).entity("Trail '"+ trailName+"' doesn´t exist.").build();
+				
 			
 			
-			/*Key startKey = datastore.newKeyFactory()
-					.addAncestor(PathElement.of("Trail", trail.name))
-					.setKind("Start")
-					.newKey(trail.name);
-			
-			Entity startEntity = Entity.newBuilder(startKey)
-					.set("Lat", trail.start.lat)
-					.set("Lng", trail.start.lng)
-					.set("Type", trail.start.type)
-					.set("Description", trail.start.content)
-					.build();
-			
-			Key endKey = datastore.newKeyFactory()
-					.addAncestor(PathElement.of("Trail", trail.name))
-					.setKind("End")
-					.newKey(trail.name);
-			
-			Entity endEntity = Entity.newBuilder(endKey)
-					.set("Lat", trail.end.lat)
-					.set("Lng", trail.end.lng)
-					.set("Type", trail.end.type)
-					.set("Description", trail.end.content)
-					.build();
-			
-			/*Entity trailEntity1 = Entity.newBuilder(trailKey)
-					.set("Name", trail.name)
-					.set("Start", startEntity)
-					.set("End", endEntity)
-					.build();
-			*/
+			String name = trailEntity.getString("name");
+			String description = trailEntity.getString("description");
+			String trailImg = trailEntity.getString("trailImg");
+			String creator = trailEntity.getString("creator");
+			String start = trailEntity.getString("start");
+			String end = trailEntity.getString("end");
+			String markerstxt = trailEntity.getString("markers");
+			double avgRating = trailEntity.getDouble("avgRating");
+			int nRatings =  (int) trailEntity.getLong("nRatings");
+			double dist = trailEntity.getDouble("dist");
+			boolean verified = trailEntity.getBoolean("verified");
 			
 			
 			
 			/*
-			for(int i =0; i < trail.markers.size(); i++) {
-				
-				Key markerKey = datastore.newKeyFactory()
-						.addAncestor(PathElement.of("Trail", trail.name))
-						.setKind("Marker")
-						.newKey(trail.markers.get(i).id);
-				
-				Entity markerEntity = Entity.newBuilder(markerKey)
-						.set("ID", trail.markers.get(i).id)
-						.set("Lat", trail.end.lat)
-						.set("Lng", trail.end.lng)
-						.set("Type", trail.end.type)
-						.set("Description", trail.end.content)
-						.build();
-				
-				datastore.add(markerEntity);
-			}*/
-		
-
-		
-		
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			
+			//get markers from storage
+			BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/ "+ trailName +"/markers");
+	     	BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+	     	Blob blob = storage.get(blobId);
+	     	blob.reader().read(buffer);
+	     	if(blob.reader().isOpen())
+	     		blob.reader().close();
+	     	String asd =  Arrays.toString(buffer.array());
+	     	//List<Marker> markers = g.fromJson(g.toJson(storage.get(blobId)), new TypeToken<ArrayList<Marker>>() {}.getType());
+	     	
+	     	ObjectMapper mapper = new ObjectMapper();
+	     	CollectionType javaType = mapper.getTypeFactory().constructCollectionType(List.class, Marker.class);
+	     	String markersJson = g.toJson(storage.get(blobId));
+	     	List<Marker> markers = mapper.readValue(markersJson, javaType);
+			
+			BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/"+ trailName +"/markers.json");
+	     	BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+	     	Blob blob = storage.get(blobId);
+	     	Type listOfMyClassObject = new TypeToken<ArrayList<Marker>>() {}.getType();
+	     	 
+	     	ByteBuffer buffer = ByteBuffer.allocate(1024*64);
+	     	
+	     	blob.reader().read(buffer);
+	     	if(blob.reader().isOpen())
+	     		blob.reader().close();
+	     	
+	     	String asd =  Arrays.toString(buffer.array());
+	        List<Marker> markers = g.fromJson(asd, listOfMyClassObject);
+	     	*/
+			
+			Trail trail = new Trail(name, description, trailImg, creator, start, end, null, avgRating, nRatings, dist, verified);
+			
+			
+			
+			return Response.ok(g.toJson(trail)).build();
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 		
 	}
 	
 	
-	/*@POST
-	@Path("/get")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getTrail(String trailName) {
-		
-		Trail trail= new Trail(trailName);
-		
-		long latStart;
-		long lngStart;
-		String typeStart;
-		String descriptionStart;
-		
-		Key startKey = datastore.newKeyFactory().addAncestor(PathElement.of("Trail", trailName))
-				.setKind("Start").newKey(trailName);
-		
-		Entity startEntity = datastore.get(startKey);
-		
-		latStart = startEntity.getLong("Lat");
-		lngStart = startEntity.getLong("Lng");
-		typeStart=startEntity.getString("Type");
-		descriptionStart = startEntity.getString("Description");
-		
-		Marker start = new Marker("-1", latStart, lngStart, typeStart, descriptionStart);
-		
-		long latEnd;
-		long lngEnd;
-		String typeEnd;
-		String descriptionEnd;
-		
-		Key EndKey = datastore.newKeyFactory().addAncestor(PathElement.of("Trail", trailName))
-				.setKind("End").newKey(trailName);
-		
-		Entity EndEntity = datastore.get(EndKey);
-		
-		latStart = EndEntity.getLong("Lat");
-		lngStart = EndEntity.getLong("Lng");
-		typeStart= EndEntity.getString("Type");
-		descriptionStart = EndEntity.getString("Description");
-		
-		Marker End = new Marker("-1", latStart, lngStart, typeStart, descriptionStart);
-		
-		List<Marker> markers = new ArrayList<Marker>();
-		
-		Key trailKey = trailKeyFactory.newKey(trailName);
-		Entity trailEntity = datastore.get(trailKey);
-		
-		int size = (int) trailEntity.getLong("NumberMarkers");
-				
-		for(int i =0; i < size; i++) {
-			long lat;
-			long lng;
-			String type;
-			String description;
-			
-			Key Key = datastore.newKeyFactory().addAncestor(PathElement.of("Trail", trailName))
-					.setKind("Marker").newKey(i);
-			
-			Entity Entity = datastore.get(Key);
-			
-			lat = Entity.getLong("Lat");
-			lng = Entity.getLong("Lng");
-			type= Entity.getString("Type");
-			description = Entity.getString("Description");
-			
-			String id = String.valueOf(i);
-			
-			Marker marker = new Marker(id, latStart, lngStart, typeStart, descriptionStart);
-			
-			markers.add(marker);
-		}
-		
-		trail.addMarker(start);
-		
-		for(Marker i :markers) {
-			trail.addMarker(i);
-		}
-		
-		trail.addMarker(End);
-		
-		return Response.ok(g.toJson(trail)).build();
-	}*/
+	/**
+	 * Checks that the file extension is supported.
+	 * from: https://cloud.google.com/java/getting-started-appengine-standard/using-cloud-storage#handle_user_uploads
+	 */
+	private void checkFileExtension(String fileName) throws ServletException {
+	  if (fileName != null && !fileName.isEmpty() && fileName.contains(".")) {
+	    String[] allowedExt = {".jpg", ".jpeg", ".png", ".gif"};
+	    for (String ext : allowedExt) {
+	      if (fileName.endsWith(ext)) {
+	        return;
+	      }
+	    }
+	    throw new ServletException("file must be an image");
+	  }
+	}
+	
 }

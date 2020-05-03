@@ -1,34 +1,15 @@
-{	"name":"Sintra/Cascais",
-	"start":{
-		"coords":{"lat":38.691369,"lng":-9.430619},
-		"iconImg":
-		{
-			"url":"/images/start.png",
-			"size":{"width":512,"height":512},
-			"scaledSize":{"width":56,"height":56},
-			"origin":{"x":0,"y":0},
-			"anchor":{"x":28,"y":56}
-		},
-		"content":"<h1>Boca do Inferno</h1><img src=\"/images/bocadoinferno.jpg\" alt=\"picture\"><h1>Acidente geológico integrado num campo</h1><h1>de lapiás, que corresponde a</h1><h1>uma enorme caverna cujo teto</h1><h1>abateu, devido à força erosiva</h1><h1>das ondas e à dissolução dos</h1><h1>calcários pela água das chuvas.</h1><h1>A visitar ainda alguns elementos</h1><h1>singulares, tais como a chaminé vulcânica</h1><h1>na praia do Guincho, o sistema dunar</h1><h1>Guincho-Oitavos e a duna consolidada</h1><h1>de Oitavos. Prosseguir pela N247;</h1>",
-		"stopover": true
-	},
-	"end":{
-		"coords":{"lat":38.8029,"lng":-9.3817},
-		"iconImg":
-		{
-			"url":"/images/finish.png",
-			"size":{"width":512,"height":512},
-			"scaledSize":{"width":56,"height":56},
-			"origin":{"x":0,"y":0},
-			"anchor":{"x":28,"y":56}
-		},
-		"content":"<h1>Sintra</h1><img src=\"/images/sintra.jpg\" alt=\"picture\"><h1>Situada na encosta norte da</h1><h1>serra de Sintra, o enquadramento</h1><h1>harmonioso da vila de Sintra, parques e</h1><h1>quintas com os seus palácios e edifícios</h1><h1>senhoriais, criaram “uma combinação</h1><h1>única de parques e jardins que</h1><h1>influenciou o desenvolvimento das</h1><h1>paisagens na Europa” (UNESCO, 1996).</h1><h1>Tanto em Sintra como na sua envolvente</h1><h1>existem numerosos locais a visitar como</h1><h1>o Parque da Pena, Quinta da Regaleira,</h1><h1>Convento dos Capuchos, Pedras Irmãs,</h1><h1>Anta de Adrenunes e Peninha.</h1>",
-		"stopover": true
-		
-	},
+{		"name":"SintraCascais",
+		"description":"percurso de cascais a sintra",
+		"trailImg":"someimage",
+		"creator": "someuser",
+		"start":"Boca do Inferno",
+		"end":"Sintra",
 		"markers":[
 			{
+				"name": "Boca do Inferno",
 				"coords":{"lat":38.691369,"lng":-9.430619},
+				"content":"Acidente geológico integrado num campo de lapiás, que corresponde a uma enorme caverna cujo teto abateu, devido à força erosiva das ondas e à dissolução dos calcários pela água das chuvas. A visitar ainda alguns elementos singulares, tais como a chaminé vulcânica na praia do Guincho, o sistema dunar Guincho-Oitavos e a duna consolidada de Oitavos. Prosseguir pela N247;",
+				"imgURL":"bocadoinferno.jpg",
 				"iconImg":
 				{
 					"url":"/images/start.png",
@@ -37,7 +18,6 @@
 					"origin":{"x":0,"y":0},
 					"anchor":{"x":28,"y":56}
 				},
-				"content":"<h1>Boca do Inferno</h1><img src=\"/images/bocadoinferno.jpg\" alt=\"picture\"><h1>Acidente geológico integrado num campo</h1><h1>de lapiás, que corresponde a</h1><h1>uma enorme caverna cujo teto</h1><h1>abateu, devido à força erosiva</h1><h1>das ondas e à dissolução dos</h1><h1>calcários pela água das chuvas.</h1><h1>A visitar ainda alguns elementos</h1><h1>singulares, tais como a chaminé vulcânica</h1><h1>na praia do Guincho, o sistema dunar</h1><h1>Guincho-Oitavos e a duna consolidada</h1><h1>de Oitavos. Prosseguir pela N247;</h1>",
 				"stopover": true
 			},
 			{
@@ -45,36 +25,44 @@
 				"iconImg":null,
 				"content": null,
 				"stopover":false
-				
 			},
 			{
+				"name":"Abano",
 				"coords":{"lat":38.722477,"lng":-9.477907},
+				"content":"Linha de costa, pontuada pelo Forte do Guincho, apresenta grande interesse em termos geológicos.",
+				"imgURL":"abano.jpg",
 				"iconImg":null,
-				"content":"<h1>Abano</h1><img src=\"/images/abano.jpg\" alt=\"picture\"><h1>Linha de costa, pontuada pelo</h1><h1>Forte do Guincho, apresenta grande</h1><h1>interesse em termos geológicos. O</h1><h1>troço de costa compreendido entre a</h1><h1>ponta da Abelheira e a praia do Abano</h1><h1>exibe grande diversidade geológica, com</h1><h1>o aparecimento de numerosos filões</h1><h1>eruptivos, que por vezes, se chegam a</h1><h1>entrecruzar.Toda esta unidade apresenta</h1><h1>grande importância para a fauna, pois</h1><h1>enquanto a faixa costeira, pela fraca</h1><h1>presença humana, permite a fixação das</h1><h1>espécies animais, a faixa terrestre faculta</h1><h1>importantes habitats de alimentação.</h1><h1>Encontram-se nesta unidade espécies</h1><h1>como o Bufo-real Bubo bubo, a </h1><h1>Víboracornuda Vipera latastei e algumas</h1><h1>espécies de morcegos Rhinolophus</h1><h1>ferrumequim, Rhinolophus hipposideros,</h1><h1>Myotis myotis. Continuar pela N247, e na</h1><h1>localidade de Azoia, entrar na estrada de</h1><h1>acesso ao cabo da Roca;</h1>",
-				"stopover":true
-				
+				"stopover":true	
 			},
-			{
+			{	
+				"name":"Cabo da Roca",
 				"coords":{"lat":38.7804,"lng":-9.4989},
+				"content":"O “Promontório Magno” dos Romanos, é um miradouro natural por excelência sobre o mar, que em dias límpidos permite a visibilidade até às Berlengas.",
+				"imgURL":"cabodaroca.jpg",
 				"iconImg":null,
-				"content":"<h1>Cabo da Roca</h1><img src=\"/images/cabodaroca.jpg\" alt=\"picture\"><h1>O “Promontório Magno” dos Romanos, é um</h1><h1>miradouro natural por excelência sobre o mar,</h1><h1>que em dias límpidos permite a visibilidade</h1><h1>até às Berlengas.A imponente arriba</h1><h1>granítica de 140 m sobre o vasto oceano</h1><h1>Atlântico não é, no entanto, o ponto</h1><h1>mais alto de toda a costa portuguesa.</h1><h1>Um pouco mais a norte, sobranceiro à</h1><h1>praia da Aroeira, encontra-se o cabeço</h1><h1>das Oureças que se eleva a 154m. O</h1><h1>Cruzeiro do Cabo da Roca marca o</h1><h1>ponto mais ocidental da Europa</h1><h1>continental e o farol, a poucos metros</h1><h1>de distância do cruzeiro, indica a</h1><h1>proximidade de terra para quem navega</h1><h1>ao largo. Nos dias de nevoeiro, o que o</h1><h1>cabo perde em vista, ganha em</h1><h1>sonoridade: ao rumor do mar junta-se o</h1><h1>“ronco” do farol a avisar as</h1><h1>embarcações. Nesta faixa de território</h1><h1>encontra-se um inestimável valor</h1><h1>ambiental: a dificuldade de acesso à</h1><h1>costa (baixo nível de perturbação do</h1><h1>habitat) e uma vegetação rasteira</h1><h1>(facilidade de acesso ao solo) permitem</h1><h1>uma importante presença quer de</h1><h1>avifauna residente como o Falcão-peregrino</h1><h1>Falco peregrinus, a Águia-deasa-redonda</h1><h1>Buteo buteo ou Bufo-real</h1><h1>Bubo bubo, quer de avifauna migratória</h1><h1>como o Andorinhão-real Apus melba</h1><h1>entre outros. Destacam-se como</h1><h1>elementos singulares: Cabo da Roca (o</h1><h1>antigo \"Promontorium Magnum\" dos</h1><h1>Romanos), Pedra da Urza e o Forte do</h1><h1>Espinhaço ou Forte da Nossa Senhora</h1><h1>da Roca. Regressar à N247 para Colares;</h1>",
 				"stopover":true
 			},
 			{
+				"name":"Ribeira de Colares",
 				"coords":{"lat":38.803533,"lng":-9.449552},
+				"content":"É dominada pela depressão onde a sinuosa ribeira marca o seu percurso em direção ao mar.",
+				"imgURL":"ribeiradecolares.jpg",
 				"iconImg":null,
-				"content":"<h1>Ribeira de Colares</h1><img src=\"/images/ribeiradecolares.jpg\" alt=\"picture\"><h1>É dominada pela depressão onde a</h1><h1>sinuosa ribeira marca o seu percurso</h1> <h1>em direção ao mar.Azona compreendida</h1> <h1>entre Almoçageme e a praia das Maçãs,</h1><h1>considerada o “solar” da vinha de Colares,</h1><h1>tem vindo a sofrer alterações com a</h1> <h1>substituição por construções para habitação.</h1><h1>Destacam-se como elementos</h1><h1>singulares: Capela de São Mamede de</h1><h1>Janas, Banzão, pista de pegadas de</h1><h1>Dinossáurios, a antiga linha dos elétricos</h1><h1>Sintra/praia das Maçãs e o Fojo da</h1><h1>Adraga. Seguir pela N375 para Sintra;</h1>",
-				"stopover":true
-				
+				"stopover":true				
 			},
 			{
+				"name":"Serra de Sintra",
 				"coords":{"lat":38.80181,"lng":-9.395254},
+				"content":"Apresenta uma forte identidade que lhe advém de um peso histórico e cultural indiscutível.",
+				"imgURL":"serradesintra.jpg",
 				"iconImg":null,
-				"content":"<h1>Serra de Sintra</h1><img src=\"/images/serradesintra.jpg\" alt=\"picture\"><h1>Apresenta uma forte identidade que</h1><h1>lhe advém de um peso histórico e</h1><h1>cultural indiscutível.A complexidade</h1><h1>e a combinação entre património</h1><h1>”natural” e património construído</h1><h1>tornam-na ímpar.A serra apresenta-se</h1><h1>luxuriante, em que parques e quintas</h1><h1>históricas contribuem com autênticos</h1><h1>jardins botânicos, com espécies de</h1><h1>todo o mundo, como o Parque de</h1><h1>Monserrate e o Palácio de Seteais;</h1>",
 				"stopover":true
 			},
 			{
+				"name":"Sintra",
 				"coords":{"lat":38.8029,"lng":-9.3817},
+				"content":"Situada na encosta norte da serra de Sintra, o enquadramento harmonioso da vila de Sintra, parques e quintas com os seus palácios e edifícios senhoriais, criaram “uma combinação única de parques e jardins que influenciou o desenvolvimento das paisagens na Europa” (UNESCO, 1996). Tanto em Sintra como na sua envolvente existem numerosos locais a visitar como o Parque da Pena, Quinta da Regaleira, Convento dos Capuchos, Pedras Irmãs, Anta de Adrenunes e Peninha.",
+				"imgURL":"sintra.jpg",
 				"iconImg":
 				{
 					"url":"/images/finish.png",
@@ -83,11 +71,11 @@
 					"origin":{"x":0,"y":0},
 					"anchor":{"x":28,"y":56}
 				},
-				"content":"<h1>Sintra</h1><img src=\"/images/sintra.jpg\" alt=\"picture\"><h1>Situada na encosta norte da</h1><h1>serra de Sintra, o enquadramento</h1><h1>harmonioso da vila de Sintra, parques e</h1><h1>quintas com os seus palácios e edifícios</h1><h1>senhoriais, criaram “uma combinação</h1><h1>única de parques e jardins que</h1><h1>influenciou o desenvolvimento das</h1><h1>paisagens na Europa” (UNESCO, 1996).</h1><h1>Tanto em Sintra como na sua envolvente</h1><h1>existem numerosos locais a visitar como</h1><h1>o Parque da Pena, Quinta da Regaleira,</h1><h1>Convento dos Capuchos, Pedras Irmãs,</h1><h1>Anta de Adrenunes e Peninha.</h1>"
+				"stopover":true
 			}
 		],
-				"description":"",
-				"trailImg":"",
-				"dist":""
-			
+		"avgRating": 0.0,
+		"nRatings": 0,
+		"dist":25.0,
+		"verified": false	
 	}
