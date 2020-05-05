@@ -1,19 +1,25 @@
 package util;
 
 public class Marker {
-	
-	public long lat;
-	public long lng;
+	public String name;
+	public Coords coords;
 	public String type;
-	public String description;
-	public String id;
+	public String content;
+	public String imgURL;
+	public IconImg iconImg;
+	public boolean stopover;
 	
-	public Marker (String id, long lat, long lng, String type, String description) {
-		this.id=id;
-		this.lat=lat;
-		this.lng=lng;
-		this.type=type;
-		this.description=description;
+	public Marker() {}
+	
+	
+	public Marker (String name, Coords coords, String type, String content, String imgURL, IconImg iconImg, boolean stopover) {
+		this.name = name;
+		this.coords = coords;
+		this.type= type;
+		this.content= content;
+		this.imgURL = imgURL;
+		this.iconImg =  iconImg;
+		this.stopover = stopover;
 	}
 
 }

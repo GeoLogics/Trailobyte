@@ -1,33 +1,51 @@
 package util;
 
-import java.util.ArrayList;
+
 import java.util.List;
+
 
 public class Trail {
 	
-	public List<Marker> markers;
 	public String name;
-	public Marker start;
-	public Marker end;
+	public String description;
+	public String trailImg;
+	public String creator;
 	
-	public Trail(String name) {
+	public String start;
+	public String end;
+	public List<Marker> markers;
+	
+	public double avgRating;
+	public int nRatings;
+	public double dist;
+	
+	public boolean verified;
+	
+	
+	
+	
+	public Trail() {}
+	
+	
+	public Trail(String name, String description, String trailImg, String creator, String start, String end, List<Marker> markers, double avgRating, int nRatings, double dist, boolean verified) {
 		
-		this.markers = new ArrayList<Marker>();
-		this.name=name;
+		this.name= name;
+		this.description = description;
+		this.trailImg = trailImg;
+		this.creator = creator;
+		 
+		this.markers = markers;
+		this.start = start;
+		this.end = end;
+		
+		this.avgRating = avgRating;
+		this.nRatings = nRatings;
+		this.dist = dist;
+		
+		this.verified = verified;
 		
 	}
 
-	
-	public void addMarker(Marker marker) {
-		if(markers.isEmpty())
-			start = marker;
-		
-		markers.add(marker);
-	}
-	
-	public void addLast(Marker marker) {
-		end = marker;
-	}
 	
 	public int getNumberMarkers() {
 		return markers.size();
