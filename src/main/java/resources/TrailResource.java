@@ -1,5 +1,6 @@
 package resources;
 
+<<<<<<< Updated upstream
 import java.util.ArrayList;
 import java.util.Arrays;
 <<<<<<< HEAD
@@ -7,6 +8,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 >>>>>>> 7f22542932fa3435a205aa9a01db5c0981654f3b
+=======
+>>>>>>> Stashed changes
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +17,7 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -33,35 +36,30 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+<<<<<<< Updated upstream
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.google.appengine.repackaged.com.google.gson.reflect.TypeToken;
 <<<<<<< HEAD
 =======
 import com.google.cloud.Timestamp;
 >>>>>>> 7f22542932fa3435a205aa9a01db5c0981654f3b
+=======
+>>>>>>> Stashed changes
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.KeyFactory;
+<<<<<<< Updated upstream
 import com.google.cloud.datastore.PathElement;
 <<<<<<< HEAD
 =======
@@ -73,19 +71,20 @@ import com.google.cloud.datastore.Value;
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
 import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
+=======
+import com.google.cloud.datastore.Transaction;
+>>>>>>> Stashed changes
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 
 import util.LongURL;
 import util.Marker;
-import util.RegisterData;
+import util.Review;
 import util.Trail;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
@@ -101,7 +100,8 @@ public class TrailResource {
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Storage storage = StorageOptions.newBuilder().setProjectId("trailobyte-275015").build().getService();
 	private final KeyFactory trailKeyFactory = datastore.newKeyFactory().setKind("Trail");
-	
+	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+	private final KeyFactory reviewKeyFactory = datastore.newKeyFactory().setKind("Review");
 	private final Gson g = new Gson();
 	
 	public TrailResource() {
@@ -113,19 +113,20 @@ public class TrailResource {
 	
 	@SuppressWarnings("deprecation")
 	@POST
-	@Path("/postimage")
+	@Path("/post")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response postImage(@Context HttpServletRequest req, @Context HttpServletResponse res)  throws ServletException, IOException, FileUploadException {
 		
 		 ServletFileUpload upload = new ServletFileUpload();
          FileItemIterator iterator = upload.getItemIterator(req);
+         BlobInfo markersBlobInfo = null;
          
         
          Trail trail = null;
          Key trailKey = null;
          Transaction txn = null;
          FileItemStream item;
-         String markersMediaLink = "";
+         String markersMediaLink = null;
          
                
          try {
@@ -138,38 +139,43 @@ public class TrailResource {
 	        		JsonObject jsonObject = (JsonObject)jsonParser.parse(new InputStreamReader(item.openStream(), "UTF-8"));
 	        		trail = g.fromJson(jsonObject, Trail.class);
 	        		trailKey = trailKeyFactory.newKey(trail.name);
-	        		if(datastore.get(trailKey) != null)
-						return null;
+	        		//if(datastore.get(trailKey) != null) // a verificaçao a fazer aqui é se o utilizador é o autor
+						//return null;
 	        		
 	        		//store markers list
-	        		BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/ "+ trail.name +"/"+"markers.json");
-     	        	BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-     	        	//String saveMarkers = "{\"markers\":"+ g.toJson(trail.markers).toString() +"}";
-     	        	markersMediaLink = storage.create(blobInfo, g.toJson(trail.markers).toString().getBytes()).getMediaLink();
-     				
+	        		BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/"+ trail.name +"/"+"markers.json");
+     	        	markersBlobInfo = BlobInfo.newBuilder(blobId).build();
+     	        	
+     	        	
 	        	 }
 	        		 
 	        	 else {
-	        		//store trail's image
-	        		 if(item.getName().equals(trail.name)) {
-	        			 BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/" + item.getName());
-		 	     	     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-		 	     			
-		 	     		 //saves image's storage URL to trailImg in the trail (the trailImg comes with picture_name.jpg or null)
-		 	     	     if(trail.trailImg !=null && trail.trailImg.equals(item.getName()))
-		 	     	    	trail.trailImg = storage.create(blobInfo, toByteArray(stream)).getMediaLink();
+	        		 if(!checkFileExtension(item.getName()))
+	        			 return Response.status(Status.FORBIDDEN).entity("File " + item.getName() + " format not accepted.").build();
+	        		 //store trail's image
+	        		 if(item.getName().equals(trail.trailImg)) {
+	        			 //saves image's storage URL to trailImg in the trail (the trailImg comes with picture_name.jpg or null)
+		 	     	     if(trail.trailImg !=null && trail.trailImg.equals(item.getName())) {
+		 	     	    	 BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/pictures/" + item.getName());
+			 	     	     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+		 	     	    	 trail.trailImg = storage.create(blobInfo, toByteArray(stream)).getMediaLink();
+		 	     	     }
 	        		 }else {
-	        			//store marker's images 
-	 	        		BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/pictures/" + item.getName());
-	 	     	        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-	 	     			
-	 	     			//saves image's storage URL to imgURL in the marker (the imgURL comes with picture_name.jpg or null)
+	        			//saves image's storage URL to imgURL in the marker (the imgURL comes with picture_name.jpg or null)
 	 	     			for(Marker aux : trail.markers)
-	 	     				if(aux.imgURL !=null && aux.imgURL.equals(item.getName()))
+	 	     				if(aux.imgURL !=null && aux.imgURL.equals(item.getName())) {
+	 	     					//store marker's images
+	 		 	        		BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/pictures/" + item.getName());
+	 		 	     	        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
 	 	     					aux.imgURL = storage.create(blobInfo, toByteArray(stream)).getMediaLink();
+	 	     				}
 	        		 }	        		
 	        	 }	 
 			 }
+
+			 if(markersBlobInfo != null)
+				 markersMediaLink = storage.create(markersBlobInfo, g.toJson(trail.markers).toString().getBytes()).getMediaLink();
+				
 			 txn = datastore.newTransaction();
 			 
 			 Entity trailEntity = Entity.newBuilder(trailKey)
@@ -178,7 +184,7 @@ public class TrailResource {
 					.set("trailImg", trail.trailImg)
 					.set("creator", trail.creator)
 					
-					.set("markers", markersMediaLink )
+					.set("markers", markersMediaLink)
 					.set("start", trail.markers.get(0).name)
 					.set("end", trail.markers.get(trail.markers.size()-1).name)
 					
@@ -204,29 +210,6 @@ public class TrailResource {
 	   }
 	
 	
-	
-	
-	
-	
-	
-	//from:https://www.techiedelight.com/convert-inputstream-byte-array-java/
-	private static byte[] toByteArray(InputStream in) throws IOException {
-
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-		byte[] buffer = new byte[1024];
-		int len;
-
-		// read bytes from the input stream and store them in buffer
-		while ((len = in.read(buffer)) != -1) {
-			// write bytes from the buffer into output stream
-			os.write(buffer, 0, len);
-		}
-
-		return os.toByteArray();
-	}
-	
-	
 	@GET
 	@Path("/get/{trailName}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -246,50 +229,24 @@ public class TrailResource {
 			String creator = trailEntity.getString("creator");
 			String start = trailEntity.getString("start");
 			String end = trailEntity.getString("end");
-			String markerstxt = trailEntity.getString("markers");
 			double avgRating = trailEntity.getDouble("avgRating");
 			int nRatings =  (int) trailEntity.getLong("nRatings");
 			double dist = trailEntity.getDouble("dist");
 			boolean verified = trailEntity.getBoolean("verified");
 			
+
+			BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/"+ trailName +"/markers.json");	
+			Blob blob = storage.get(blobId);
 			
+		
 			
-			/*
-			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			byte[] content = blob.getContent();
+			String data = new String(content);
 			
-			//get markers from storage
-			BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/ "+ trailName +"/markers");
-	     	BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-	     	Blob blob = storage.get(blobId);
-	     	blob.reader().read(buffer);
-	     	if(blob.reader().isOpen())
-	     		blob.reader().close();
-	     	String asd =  Arrays.toString(buffer.array());
-	     	//List<Marker> markers = g.fromJson(g.toJson(storage.get(blobId)), new TypeToken<ArrayList<Marker>>() {}.getType());
+			ObjectMapper mapper = new ObjectMapper();
+	     	List<Marker> markerList = mapper.readValue(data, new TypeReference<List<Marker>>(){});
 	     	
-	     	ObjectMapper mapper = new ObjectMapper();
-	     	CollectionType javaType = mapper.getTypeFactory().constructCollectionType(List.class, Marker.class);
-	     	String markersJson = g.toJson(storage.get(blobId));
-	     	List<Marker> markers = mapper.readValue(markersJson, javaType);
-			
-			BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/"+ trailName +"/markers.json");
-	     	BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-	     	Blob blob = storage.get(blobId);
-	     	Type listOfMyClassObject = new TypeToken<ArrayList<Marker>>() {}.getType();
-	     	 
-	     	ByteBuffer buffer = ByteBuffer.allocate(1024*64);
-	     	
-	     	blob.reader().read(buffer);
-	     	if(blob.reader().isOpen())
-	     		blob.reader().close();
-	     	
-	     	String asd =  Arrays.toString(buffer.array());
-	        List<Marker> markers = g.fromJson(asd, listOfMyClassObject);
-	     	*/
-			
-			Trail trail = new Trail(name, description, trailImg, creator, start, end, null, avgRating, nRatings, dist, verified);
-			
-			
+			Trail trail = new Trail(name, description, trailImg, creator, start, end, markerList, avgRating, nRatings, dist, verified);
 			
 			return Response.ok(g.toJson(trail)).build();
 			
@@ -300,20 +257,97 @@ public class TrailResource {
 		
 	}
 	
+	@POST
+	@Path("/postreview")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response postReview(Review review)  {
+		
+		Transaction txn = null;
+		
+		try {
+			String username = review.author;
+			String trailName = review.trailName;
+			String comment = review.comment;
+			double rating = review.rating;
+			
+			Key userKey = userKeyFactory.newKey(username);
+			if(datastore.get(userKey) ==  null)
+				return Response.status(Status.NOT_FOUND).entity("User " + username + " does not exist.").build();
+			
+			Key trailKey = trailKeyFactory.newKey(trailName);
+			if(datastore.get(trailKey) ==  null)
+				return Response.status(Status.NOT_FOUND).entity("Trail " + trailName + " does not exist.").build();
+			
+			Key reviewKey = reviewKeyFactory.newKey(username+trailName);
+			if(datastore.get(reviewKey) != null)
+				return Response.status(Status.FORBIDDEN).entity("User " + username + " already posted a review for trail" + trailName).build();
+			
+			txn = datastore.newTransaction();
+			 
+			Entity reviewEntity = Entity.newBuilder(reviewKey)
+					.set("author", username)
+					.set("trailName", trailName)
+					.set("comment", comment)
+					.set("rating", rating)
+					.build();
+			
+			Entity trail = datastore.get(trailKey);
+			int reviewrs = (int) trail.getLong("nRatings");
+			double avgRating = trail.getDouble("avgRating");
+			double newRating= (reviewrs*avgRating + rating) / (reviewrs+1);
+			
+			Entity updatedTrailEntity = Entity.newBuilder(trailKey)
+					.set("nRatings", reviewrs+1)
+					.set("avgRating", newRating)
+					.build();
+						
+			txn.put(updatedTrailEntity);
+			txn.put(reviewEntity);
+			txn.commit();
+			return Response.ok("User " + username + " already posted a " + rating +"* review for trail" + trailName).build();
+				
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(txn.isActive())
+				txn.rollback();
+		}
+		return null;
+	}
+	
+	
+	
+	//from:https://www.techiedelight.com/convert-inputstream-byte-array-java/
+	private static byte[] toByteArray(InputStream in) throws IOException {
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+		byte[] buffer = new byte[1024];
+		int len;
+
+		// read bytes from the input stream and store them in buffer
+		while ((len = in.read(buffer)) != -1) {
+			// write bytes from the buffer into output stream
+			os.write(buffer, 0, len);
+		}
+
+		return os.toByteArray();
+	}	
 	
 	/**
 	 * Checks that the file extension is supported.
 	 * from: https://cloud.google.com/java/getting-started-appengine-standard/using-cloud-storage#handle_user_uploads
 	 */
-	private void checkFileExtension(String fileName) throws ServletException {
+	private boolean checkFileExtension(String fileName) {
 	  if (fileName != null && !fileName.isEmpty() && fileName.contains(".")) {
 	    String[] allowedExt = {".jpg", ".jpeg", ".png", ".gif"};
 	    for (String ext : allowedExt) {
 	      if (fileName.endsWith(ext)) {
-	        return;
+	        return true;
 	      }
 	    }
-	    throw new ServletException("file must be an image");
+	   	return false;
 	  }
 	}
 =======
