@@ -78,6 +78,8 @@ public class TempQuestionResource {
 	
 	
 	/*
+	 //ROLES: ADMIN
+	//OP_CODE: PTQMCID1
 	@POST
 	@Path("/postQMCID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -104,6 +106,8 @@ public class TempQuestionResource {
 		return null;
 	}
 	
+	//ROLES: ADMIN
+	//OP_CODE: PTQOID1
 	@POST
 	@Path("/postQOID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -130,6 +134,9 @@ public class TempQuestionResource {
 		return null;
 	}
 	
+	
+	//ROLES: ADMIN
+	//OP_CODE: PTQTFID1
 	@POST
 	@Path("/postQTFID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -157,6 +164,8 @@ public class TempQuestionResource {
 	}*/
 	
 	
+	 //ROLES: E1, E2, E3, E4
+	//OP_CODE: PTQMC1
 	@POST
 	@Path("/postQMC")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -202,7 +211,8 @@ public class TempQuestionResource {
 		return null;
 	}
 	
-	
+	 //ROLES: E3, BOQ, BO, ADMIN
+	//OP_CODE: GTQMC1
 	@GET
 	@Path("/getQMC/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -241,7 +251,8 @@ public class TempQuestionResource {
 	}
 	
 	
-	
+	 //ROLES: E1, E2, E3, E4
+	//OP_CODE: PTQO1
 	@POST
 	@Path("/postQO")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -287,7 +298,8 @@ public class TempQuestionResource {
 		return null;
 	}
 	
-	
+	 //ROLES: E3, BOQ, BO, ADMIN
+	//OP_CODE: GTQO1
 	@GET
 	@Path("/getQO/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -325,7 +337,8 @@ public class TempQuestionResource {
 		return null;
 	}
 	
-	
+	 //ROLES: E1, E2, E3, E4
+	//OP_CODE: PTQTF1
 	@POST
 	@Path("/postQTF")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -373,7 +386,8 @@ public class TempQuestionResource {
 	
 	
 	
-	
+	 //ROLES: E3, BOQ, BO, ADMIN
+	//OP_CODE: GTQTF1
 	@GET
 	@Path("/getQTF/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)

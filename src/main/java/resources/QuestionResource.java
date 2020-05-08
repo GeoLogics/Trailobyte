@@ -52,33 +52,11 @@ public class QuestionResource {
 		
 	}
 	
-	/*@GET
-	@Path("/getRandom")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getQuestionsAtRandom() {
-		
-		/*List<String> types = new ArrayList<String>();
-		
-		types.add("QMC");
-		types.add("QO");
-		types.add("QTF");*/
-		
-		/*Random rand = new Random();
-		
-		int QMCrand_int1 = rand.nextInt(1000); 
-		int QMCrand_int1 = rand.nextInt(1000); 
-		int QMCrand_int1 = rand.nextInt(1000); 
-		int QMCrand_int1 = rand.nextInt(1000); 
-		int QMCrand_int1 = rand.nextInt(1000); 
-		int QMCrand_int1 = rand.nextInt(1000); 
-
-		
-		return null;
-	}*/
-	
-	
-	
 	/*
+
+	//ROLES: ADMIN
+	//OP_CODE: PQMCID1
+	 
 	@POST
 	@Path("/postQMCID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -104,6 +82,9 @@ public class QuestionResource {
 		}
 		return null;
 	}
+	
+	//ROLES: ADMIN
+	//OP_CODE: PQOID1
 	
 	@POST
 	@Path("/postQOID/{id}")
@@ -131,6 +112,10 @@ public class QuestionResource {
 		return null;
 	}
 	
+	
+	//ROLES: ADMIN
+	//OP_CODE: PQTFID1
+	 
 	@POST
 	@Path("/postQTFID/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -157,7 +142,8 @@ public class QuestionResource {
 		return null;
 	}*/
 	
-	
+	//ROLES: BO, ADMIN
+	//OP_CODE: PQMC1
 	@POST
 	@Path("/postQMC")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -203,7 +189,9 @@ public class QuestionResource {
 		return null;
 	}
 	
-	
+	//ROLES: E1, E2, E3, E4
+	//OP_CODE: esta op so e usada no conjunto de varias ou seja por ex: 8 QMCs + 1 QO+ 1 QTF, para formar um quizz
+	//logo nao deve ter codigo de op
 	@GET
 	@Path("/getQMC/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -242,7 +230,8 @@ public class QuestionResource {
 	}
 	
 	
-	
+	//ROLES: BO, ADMIN
+	//OP_CODE: PQO1
 	@POST
 	@Path("/postQO")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -288,7 +277,9 @@ public class QuestionResource {
 		return null;
 	}
 	
-	
+	//ROLES: E1, E2, E3, E4
+	//OP_CODE: esta op so e usada no conjunto de varias ou seja por ex: 8 QMCs + 1 QO+ 1 QTF, para formar um quizz
+	//logo nao deve ter codigo de op
 	@GET
 	@Path("/getQO/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -326,7 +317,8 @@ public class QuestionResource {
 		return null;
 	}
 	
-	
+	//ROLES: BO, ADMIN
+	//OP_CODE: PQTF1
 	@POST
 	@Path("/postQTF")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -374,7 +366,9 @@ public class QuestionResource {
 	
 	
 	
-	
+	//ROLES: E1, E2, E3, E4
+	//OP_CODE: esta op so e usada no conjunto de varias ou seja por ex: 8 QMCs + 1 QO+ 1 QTF, para formar um quizz
+	//logo nao deve ter codigo de op
 	@GET
 	@Path("/getQTF/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -413,4 +407,27 @@ public class QuestionResource {
 	}
 
 
+	/*@GET
+	@Path("/getRandom")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response getQuestionsAtRandom() {
+		
+		/*List<String> types = new ArrayList<String>();
+		
+		types.add("QMC");
+		types.add("QO");
+		types.add("QTF");*/
+		
+		/*Random rand = new Random();
+		
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+		int QMCrand_int1 = rand.nextInt(1000); 
+
+		
+		return null;
+	}*/
 }

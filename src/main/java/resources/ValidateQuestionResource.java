@@ -42,6 +42,8 @@ public class ValidateQuestionResource {
 		
 	}
 	
+	//ROLES: BO, BOQ
+	//OP_CODE: VQMC1
 	@POST
 	@Path("/TempQMC/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -92,7 +94,8 @@ public class ValidateQuestionResource {
 		return null;
 	}
 	
-	
+	//ROLES: BO, BOQ
+	//OP_CODE: VQO1
 	@POST
 	@Path("/TempQO/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -143,7 +146,8 @@ public class ValidateQuestionResource {
 	
 	
 	
-	
+	//ROLES: BO, BOQ
+	//OP_CODE: VQTF1
 	@POST
 	@Path("/TempQTF/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)

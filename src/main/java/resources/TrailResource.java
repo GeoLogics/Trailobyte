@@ -308,6 +308,8 @@ public class TrailResource {
 	  }
 	}
 	
+	//ROLES: E1, E2, E3, E4
+	//OP_CODE: QTU1
 	
 	@POST
 	@Path("/queryByUser/{username}")
@@ -337,6 +339,8 @@ public class TrailResource {
 	}
 	
 	
+	//ROLES: E1, E2, E3, E4
+	//OP_CODE: QTR1
 	
 	@POST
 	@Path("/queryByRating")
