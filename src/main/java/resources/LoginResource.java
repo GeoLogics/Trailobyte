@@ -44,7 +44,7 @@ public class LoginResource {
 
 	public LoginResource() { }
 
-
+	
 	@POST
 	@Path("/v1")
 	@Consumes(MediaType.APPLICATION_JSON)
