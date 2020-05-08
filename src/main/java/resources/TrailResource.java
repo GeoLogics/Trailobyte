@@ -313,7 +313,6 @@ public class TrailResource {
 	
 	@POST
 	@Path("/queryByUser/{username}")
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response queryByUsername(@PathParam("username") String username) {
 		
