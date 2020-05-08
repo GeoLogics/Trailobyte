@@ -10,7 +10,8 @@ public class OperationsResource {
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
 
-
+//em tds os métodos passar username em path param?
+//se calhar a string verifier vem como header e testa-se num filter?
 
 	private boolean validSession(String verifier, String username) {
 

@@ -19,6 +19,7 @@ import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.Transaction;
 
 import util.AuthToken;
+import util.LoginData;
 import util.Validity;
 
 @Path("/logout")
@@ -68,10 +69,10 @@ public class LogoutResource {
 	@DELETE
 	@Path("/v1")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response doLogout(String username) {
+	public Response doLogout(LoginData username) {
 		LOG.fine("Attempt to logout user: " + username);
 
-		Key userKey = userKeyFactory.newKey(username);
+		Key userKey = userKeyFactory.newKey(username.username);
 		Transaction txn = datastore.newTransaction();
 
 		try {
@@ -79,20 +80,20 @@ public class LogoutResource {
 
 			if(user!= null) {
 			
-				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username);
+				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username.username);
 				Entity token = datastore.get(tokenKey);
-				Key tokenValidity = datastore.newKeyFactory().addAncestors(PathElement.of("Token", username))
+				Key tokenValidity = datastore.newKeyFactory().addAncestors(PathElement.of("Token", username.username))
 						.setKind("Validity")
-						.newKey(username);
+						.newKey(username.username);
 				
 				
 				
 				Entity validityEntity = datastore.get(tokenValidity);
 				
 				Key validityKey = datastore.newKeyFactory()
-						.addAncestor(PathElement.of("Token", username))
+						.addAncestor(PathElement.of("Token", username.username))
 						.setKind("Validity")
-						.newKey(username);
+						.newKey(username.username);
 				
 				validityEntity = Entity.newBuilder(validityKey)
 						.set("Verifier", validityEntity.getValue("Verifier").get().toString())

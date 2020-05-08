@@ -65,20 +65,22 @@ public class LoginResource {
 
 
 					Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.username);
-					Entity tokenEntity = Entity.newBuilder(tokenKey).set("username", data.username).build();
-					txn.add(tokenEntity);
+					Entity tokenEntity = Entity.newBuilder(tokenKey)
+							.set("username", data.username).build();
+					txn.put(tokenEntity);
 
 					Key validityKey = datastore.newKeyFactory()
 							.addAncestor(PathElement.of("Token", data.username))
 							.setKind("Validity")
 							.newKey(data.username);
 
-					Entity validityEntity = Entity.newBuilder(validityKey).set("Validity", data.username)
+					Entity validityEntity = Entity.newBuilder(validityKey)
 							.set("Verifier", validity.verifier)
 							.set("ExpirationData", validity.expirationData)
 							.build();
-					txn.add(validityEntity);
+					txn.put(validityEntity);
 					txn.commit();
+					//probably devolver a string verifier chega
 					return Response.ok(g.toJson(token)).build();				
 
 				} else {
@@ -94,6 +96,7 @@ public class LoginResource {
 
 		} catch (Exception e) {
 			txn.rollback();
+			LOG.warning("xd" + e);
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 
