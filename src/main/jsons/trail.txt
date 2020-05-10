@@ -1,6 +1,6 @@
 {		"name":"SintraCascais",
 		"description":"percurso de cascais a sintra",
-		"trailImg":"someimage",
+		"trailImg":"SintraCascais.jpg",
 		"creator": "someuser",
 		"start":"Boca do Inferno",
 		"end":"Sintra",
