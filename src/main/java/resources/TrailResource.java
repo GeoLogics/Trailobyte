@@ -96,6 +96,7 @@ public class TrailResource {
 	private final KeyFactory reviewKeyFactory = datastore.newKeyFactory().setKind("Review");
 	private final KeyFactory validityKeyFactory = datastore.newKeyFactory().setKind("Validity");
 	private final Utils utils = new Utils();
+	private final RoleResource roles = new RoleResource();
 	private final Gson g = new Gson();
 	
 	private RoleResource  role= new RoleResource();
@@ -106,7 +107,8 @@ public class TrailResource {
 	}
 	
 	
-	
+	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
+	//OP_CODE: T1
 	@SuppressWarnings("deprecation")
 	@POST
 	@Path("/posttrail")
@@ -207,13 +209,16 @@ public class TrailResource {
 
 
 	
-	//ROLES: E2, E4, BO, BOT
-	//OP_CODE: T1
+	//ROLES: E2, E4, BO, BOT, ADMIN
+	//OP_CODE: T2
 	@POST
 	@Path("/verifytrail")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response verifyTrail(VerifyTrailObject data){
+		Transaction txn = null;
 		
+		if(!roles.checkPermissions(data.userName, "T2"))
+			return Response.status(Status.FORBIDDEN).entity("User '"+ data.userName +"' doesn´t have the permissions to access this operation").build();
 		
 		Key trailKey = trailKeyFactory.newKey(data.trailName);
 		Entity trailEntity = datastore.get(trailKey);
@@ -225,9 +230,43 @@ public class TrailResource {
 		if(userKey == null || userEntity == null)
 			return Response.status(Status.NOT_FOUND).entity("User '"+ data.userName +"' doesn´t exist.").build();
 		
+		
+		try {
+			 txn = datastore.newTransaction();
+			 
+			 Entity newTrailEntity = Entity.newBuilder(trailKey)
+					.set("name", trailEntity.getString("name"))
+					.set("description", trailEntity.getString("description"))
+					.set("trailImg", trailEntity.getString("trailImg"))
+					.set("creator", trailEntity.getString("creator"))
+					
+					.set("markers", trailEntity.getString("markers"))
+					.set("start", trailEntity.getString("start"))
+					.set("end", trailEntity.getString("end"))
+					
+					.set("avgRating", trailEntity.getDouble("avgRating"))
+					.set("nRatings", (int)trailEntity.getLong("nRatings"))
+					.set("dist", trailEntity.getDouble("dist"))
+					
+					.set("verified", true)
+					.build();
+				
+			 	txn.put(newTrailEntity);
+			 	txn.commit();
+			 	return Response.ok("{}").build();
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			finally{
+				if(txn.isActive())
+					txn.rollback();
+			}
 		return null;
 	}
 	
+	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
+	//OP_CODE: T3
 	@GET
 	@Path("/gettrail/{trailName}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -236,6 +275,7 @@ public class TrailResource {
 		try {
 			Key trailKey = trailKeyFactory.newKey(trailName);
 			Entity trailEntity = datastore.get(trailKey);
+			
 			if(trailEntity == null)
 				return Response.status(Status.NOT_FOUND).entity("Trail '"+ trailName+"' doesn´t exist.").build();
 				
@@ -269,34 +309,38 @@ public class TrailResource {
 		}
 	}
 	
-	
+	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
+	//OP_CODE: T4
 	@POST
 	@Path("/postreview")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postReview(Review review)  {
 		Transaction txn = null;		
-		String username = review.author;
+		String userName = review.author;
 		String trailName = review.trailName;
 		String comment = review.comment;
 		double rating = review.rating;
-			
-		Key userKey = userKeyFactory.newKey(username);
+		
+		if(!roles.checkPermissions(userName, "T4"))
+			return Response.status(Status.FORBIDDEN).entity("User '"+ userName +"' doesn´t have the permissions to access this operation").build();
+					
+		Key userKey = userKeyFactory.newKey(userName);
 		if(datastore.get(userKey) ==  null)
-			return Response.status(Status.NOT_FOUND).entity("User " + username + " does not exist.").build();
+			return Response.status(Status.NOT_FOUND).entity("User " + userName + " does not exist.").build();
 			
 		Key trailKey = trailKeyFactory.newKey(trailName);
 		if(datastore.get(trailKey) ==  null)
 			return Response.status(Status.NOT_FOUND).entity("Trail " + trailName + " does not exist.").build();
 			
-		Key reviewKey = reviewKeyFactory.newKey(username+trailName);
+		Key reviewKey = reviewKeyFactory.newKey(userName+trailName);
 		if(datastore.get(reviewKey) != null)
-			return Response.status(Status.FORBIDDEN).entity("User " + username + " already posted a review for trail " + trailName).build();
+			return Response.status(Status.FORBIDDEN).entity("User " + userName + " already posted a review for trail " + trailName).build();
 			
 		try {
 			txn = datastore.newTransaction();
 			 
 			Entity reviewEntity = Entity.newBuilder(reviewKey)
-					.set("author", username)
+					.set("author", userName)
 					.set("trailName", trailName)
 					.set("comment", comment)
 					.set("rating", rating)
@@ -327,7 +371,7 @@ public class TrailResource {
 			txn.put(updatedTrailEntity);
 			txn.put(reviewEntity);
 			txn.commit();
-			return Response.ok("User " + username + " posted a " + rating +"* review for trail " + trailName).build();
+			return Response.ok("User " + userName + " posted a " + rating +"* review for trail " + trailName).build();
 				
 		}catch(Exception e) {
 			e.printStackTrace();

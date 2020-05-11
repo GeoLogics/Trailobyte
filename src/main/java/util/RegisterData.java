@@ -11,7 +11,7 @@ public class RegisterData {
 	public String mobilePhone;
 	public String address;
 	//public AccountStateData state;
-	//public Role role;
+	public String role;
 
 	public RegisterData() {}
 	

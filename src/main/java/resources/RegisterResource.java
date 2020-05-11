@@ -62,7 +62,7 @@ public class RegisterResource {
 					.set("user_mobphone", data.mobilePhone == null ? "" : data.mobilePhone)
 					.set("user_address", data.address == null ? "" : data.address)
 					//.set("user_state", data.state == null ? "ACTIVE" : data.state.toString())
-					.set("user_role", "USER")
+					.set("user_role", data.role == null ? "E1" : data.role)
 					.set("user_creation_time", Timestamp.now())
 					.build();
 			datastore.add(user);
