@@ -63,12 +63,11 @@ public class LoginResource {
 
 					Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.username);
 					Entity tokenEntity = Entity.newBuilder(tokenKey)
-							.set("username", token.username)
 							.set("verifier", token.verifier)
 							.set("creationData", token.creationData)
 							.set("expirationData", token.expirationData)
 							.build();
-					txn.add(tokenEntity);
+					txn.put(tokenEntity);
 					
 					txn.commit();
 					return Response.ok(g.toJson(token.verifier)).build();				

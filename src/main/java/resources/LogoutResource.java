@@ -20,6 +20,8 @@ import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.Transaction;
 
+import util.Utils;
+
 
 
 @Path("/logout")
@@ -37,9 +39,16 @@ public class LogoutResource {
 	@Path("/v1")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLogout(@Context HttpServletRequest req) {
+	
 		String username = req.getHeader("username");
-		String verifier = req.getHeader("verifier");
 		
+		String[] verifierTemp = req.getHeader("Authorization").split(" ");
+		String verifier = verifierTemp[1];
+
+		Utils util = new Utils();
+		
+		if(util.Authentication(username, verifier)) {
+			
 		
 		LOG.fine("Attempt to logout user: " + username);
 		
@@ -51,17 +60,25 @@ public class LogoutResource {
 			Entity user = txn.get(userKey);
 
 			if(user!= null) {
+			
 				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username);
-				Entity token = datastore.get(tokenKey);
+				Entity tokenEntity = datastore.get(tokenKey);
+				
+				tokenEntity = Entity.newBuilder(tokenKey)
+						.set("verifier", tokenEntity.getValue("verifier").get().toString())
+						.set("creationData", tokenEntity.getValue("creationData").get().toString())
+						.set("expirationData", 0)
+						.build();
+						
 
 
-				if(token == null) {
+				if(tokenEntity == null) {
 					txn.rollback();
 					return Response.status(Status.NOT_FOUND).entity("Token not found .").build();
 
 				}else
-					txn.delete(tokenKey);
-					txn.commit();
+				txn.put(tokenEntity);
+				txn.commit();
 				return Response.ok().build();
 
 			}
@@ -76,6 +93,9 @@ public class LogoutResource {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();	
 		}
 
+		}
+		else
+			return Response.status(Status.FORBIDDEN).build();
 
 	}
 

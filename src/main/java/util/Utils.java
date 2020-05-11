@@ -4,8 +4,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.google.cloud.datastore.Datastore;
+import com.google.cloud.datastore.DatastoreOptions;
+import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.Key;
+import com.google.cloud.datastore.KeyFactory;
+
 public class Utils {
 	
+	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+	private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
+	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+
 	public Utils() { }
 	
 	
@@ -37,5 +47,17 @@ public class Utils {
 		}
 		return false;
 	}
+	
+	public boolean Authentication(String authKey, String username) {
+
+        Key tokenKey = tokenKeyFactory.newKey(authKey);
+        Entity tokenEntity = datastore.get(tokenKey);
+
+        Key userKey = userKeyFactory.newKey("username");
+        Entity userEntity = datastore.get(userKey);
+
+        return true;
+
+    }
 
 }
