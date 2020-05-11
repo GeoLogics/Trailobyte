@@ -1,28 +1,27 @@
 import React from "react";
-import { ImageBackground, StyleSheet, Text, View, Button } from "react-native";
+import { Router, Scene, Actions, ActionConst } from 'react-native-router-flux';
 
-export default class Login extends React.Component {
+import LoginScreen from './Login/LoginScreen';
+import UserScreen from './Login/UserScreen';
+
+export default class Main extends React.Component {
     render() {
         return (
-			<ImageBackground source={require('../images/mountains.jpg')} style={styles.background}>
-				<View style={styles.container}>
-				</View>
-			</ImageBackground>
+            <Router>
+                <Scene key="root">
+                    <Scene key="loginScreen"
+                        component={LoginScreen}
+                        animation='fade'
+                        hideNavBar={true}
+                        initial={true}
+                    />
+                    <Scene key="userScreen"
+                        component={UserScreen}
+                        animation='fade'
+                        hideNavBar={true}
+                    />
+                </Scene>
+            </Router>
         );
-    }
-}
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		flexDirection: "column",
-		justifyContent: "center"
-	},
-	background: {
-		flex: 1,
-		width: '100%',
-        height: '100%',
-		resizeMode: "cover",
-		justifyContent: "center"
 	}
-});
+}
