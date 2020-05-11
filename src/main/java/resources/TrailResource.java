@@ -99,7 +99,7 @@ public class TrailResource {
 	private final RoleResource roles = new RoleResource();
 	private final Gson g = new Gson();
 	
-	private RoleResource  role= new RoleResource();
+	private RoleResource role = new RoleResource();
 	
 	
 	public TrailResource() {
