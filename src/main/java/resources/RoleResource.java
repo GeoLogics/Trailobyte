@@ -93,8 +93,7 @@ public class RoleResource {
 			StringValue next =  (StringValue) iterator.next();
 			if(next.get().equals(method))
 				return true;
-		}
-				
+		}	
 		return false;
 	}
 	

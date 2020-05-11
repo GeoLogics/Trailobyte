@@ -38,7 +38,7 @@ public class Utils {
 	* Checks that the file extension is supported.
 	* from: https://cloud.google.com/java/getting-started-appengine-standard/using-cloud-storage#handle_user_uploads
 	*/
-	public boolean checkFileExtension(String fileName) {
+	public static boolean checkFileExtension(String fileName) {
 		if (fileName != null && !fileName.isEmpty() && fileName.contains(".")) {
 			String[] allowedExt = {".jpg", ".jpeg", ".png", ".gif"};
 		    for (String ext : allowedExt) 
@@ -50,14 +50,15 @@ public class Utils {
 	
 	public boolean Authentication(String authKey, String username) {
 
-        Key tokenKey = tokenKeyFactory.newKey(authKey);
+        Key tokenKey = tokenKeyFactory.newKey(username);
         Entity tokenEntity = datastore.get(tokenKey);
+        if(tokenKey == null || tokenEntity == null)
+        	return false;
 
-        Key userKey = userKeyFactory.newKey("username");
-        Entity userEntity = datastore.get(userKey);
-
-        return true;
-
+     if(authKey.equals(tokenEntity.getString("verifier")))
+        	return true;
+        
+        return false;
     }
 
 }

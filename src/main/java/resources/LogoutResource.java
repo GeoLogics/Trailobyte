@@ -31,6 +31,7 @@ public class LogoutResource {
 	private static final Logger LOG = Logger.getLogger(LogoutResource.class.getName());
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+	Utils util = new Utils();
 
 
 
@@ -40,62 +41,57 @@ public class LogoutResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLogout(@Context HttpServletRequest req) {
 
+		String[] verifierTemp = req.getHeader("Authorization").split(" ");
 		String username = req.getHeader("username");
 
-		String[] verifierTemp = req.getHeader("Authorization").split(" ");
-		String verifier = verifierTemp[1];
-
-		Utils util = new Utils();
-
-		if(!util.Authentication(username, verifier)) 
+		if(!util.Authentication(username, verifierTemp[1])) 
 			return Response.status(Status.FORBIDDEN).build();
 		
-		else
-		{
-			LOG.fine("Attempt to logout user: " + username);
+		
+		LOG.fine("Attempt to logout user: " + username);
 
 
-			Key userKey = userKeyFactory.newKey(username);
-			Transaction txn = datastore.newTransaction();
+		Key userKey = userKeyFactory.newKey(username);
+		Transaction txn = datastore.newTransaction();
 
-			try {
-				Entity user = txn.get(userKey);
+		try {
+			Entity user = txn.get(userKey);
 
-				if(user!= null) {
+			if(user!= null) {
 
-					Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username);
-					Entity tokenEntity = datastore.get(tokenKey);
+				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username);
+				Entity tokenEntity = datastore.get(tokenKey);
 
-					tokenEntity = Entity.newBuilder(tokenKey)
-							.set("verifier", tokenEntity.getValue("verifier").get().toString())
-							.set("creationData", tokenEntity.getValue("creationData").get().toString())
-							.set("expirationData", 0)
-							.build();
-
-
-
-					if(tokenEntity == null) {
-						txn.rollback();
-						return Response.status(Status.NOT_FOUND).entity("Token not found .").build();
-
-					}else
-						txn.put(tokenEntity);
-					txn.commit();
-					return Response.ok().build();
-
-				}
-				else {
-					LOG.warning("Failed logout attempt for username: " + username);
-					return Response.status(Status.FORBIDDEN).build();
-				}
+				tokenEntity = Entity.newBuilder(tokenKey)
+						.set("verifier", tokenEntity.getValue("verifier").get().toString())
+						.set("creationData", tokenEntity.getValue("creationData").get().toString())
+						.set("expirationData", 0)
+						.build();
 
 
-			}catch (Exception e) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();	
+
+				if(tokenEntity == null) {
+					txn.rollback();
+					return Response.status(Status.NOT_FOUND).entity("Token not found .").build();
+
+				}else
+					txn.put(tokenEntity);
+				txn.commit();
+				return Response.ok().build();
+
+			}
+			else {
+				LOG.warning("Failed logout attempt for username: " + username);
+				return Response.status(Status.FORBIDDEN).build();
 			}
 
+
+		}catch (Exception e) {
+			txn.rollback();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();	
 		}
+
+		
 	}
 
 }

@@ -94,12 +94,13 @@ public class TrailResource {
 	private final KeyFactory trailKeyFactory = datastore.newKeyFactory().setKind("Trail");
 	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 	private final KeyFactory reviewKeyFactory = datastore.newKeyFactory().setKind("Review");
-	private final KeyFactory validityKeyFactory = datastore.newKeyFactory().setKind("Validity");
-	private final Utils utils = new Utils();
+	private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
 	private final RoleResource roles = new RoleResource();
+	private final Utils utils = new Utils();
+
 	private final Gson g = new Gson();
 	
-	private RoleResource role = new RoleResource();
+	
 	
 	
 	public TrailResource() {
@@ -123,9 +124,15 @@ public class TrailResource {
          Transaction txn = null;
          FileItemStream item;
          String markersMediaLink = null;
-         double verificator = 0;//é suposto ser passado no form
          
-              
+         String authKey = req.getHeader("Authorization").split(" ")[1];
+         String username = req.getHeader("username");
+         
+         if(!utils.Authentication(authKey, username))
+        	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build();
+         if(!roles.checkPermissions(username, "T1"))
+        	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have the necessary permissions for this operation.").build();
+         
          try {
 			 while(iterator.hasNext()) {
 	        	 item = iterator.next();
@@ -139,8 +146,8 @@ public class TrailResource {
 	        		//if the trail already exists checks if the user making the request is the author of the trail
 	        		//if it is, the trail is updated. if not, returns
 	        		if(datastore.get(trailKey) != null){ 
-	        			Key verificatorKey = validityKeyFactory.newKey(trail.creator);
-	        			if(verificator != datastore.get(verificatorKey).getDouble("verificator"))
+	        			Key tokenKey = tokenKeyFactory.newKey(trail.creator);
+	        			if(authKey != datastore.get(tokenKey).getString("verifier"))
 	        				return Response.status(Status.FORBIDDEN).entity("Trail '"+trail.name+"' already exists and this user is not it's creator").build();
 	        		}
 	        		//store markers list
@@ -148,7 +155,7 @@ public class TrailResource {
      	        	markersBlobInfo = BlobInfo.newBuilder(blobId).build();
 	        	 } 
 	        	 else {
-	        		 if(!utils.checkFileExtension(item.getName()))
+	        		 if(!Utils.checkFileExtension(item.getName()))
 	        			 return Response.status(Status.FORBIDDEN).entity("File " + item.getName() + " format not accepted.").build();
 	        		 //store trail's image
 	        		 if(item.getName().equals(trail.trailImg)) {
@@ -156,7 +163,7 @@ public class TrailResource {
 		 	     	     if(trail.trailImg !=null && trail.trailImg.equals(item.getName())) {
 		 	     	    	 BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/pictures/" + item.getName());
 			 	     	     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-		 	     	    	 trail.trailImg = storage.create(blobInfo, utils.toByteArray(stream)).getMediaLink();
+		 	     	    	 trail.trailImg = storage.create(blobInfo, Utils.toByteArray(stream)).getMediaLink();
 		 	     	     }
 	        		 }else {
 	        			//saves image's storage URL to imgURL in the marker (the imgURL comes with picture_name.jpg or null)
@@ -165,7 +172,7 @@ public class TrailResource {
 	 	     					//store marker's images
 	 		 	        		BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/" + trail.name + "/pictures/" + item.getName());
 	 		 	     	        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-	 	     					aux.imgURL = storage.create(blobInfo, utils.toByteArray(stream)).getMediaLink();
+	 	     					aux.imgURL = storage.create(blobInfo, Utils.toByteArray(stream)).getMediaLink();
 	 	     				}
 	        		 }	        		
 	        	 }	 
@@ -214,12 +221,17 @@ public class TrailResource {
 	@POST
 	@Path("/verifytrail")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response verifyTrail(VerifyTrailObject data){
+	public Response verifyTrail(@Context HttpServletRequest req, @Context HttpServletResponse res, VerifyTrailObject data){
 		Transaction txn = null;
 		
-		if(!roles.checkPermissions(data.userName, "T2"))
-			return Response.status(Status.FORBIDDEN).entity("User '"+ data.userName +"' doesn´t have the permissions to access this operation").build();
-		
+		String authKey = req.getHeader("Authorization").split(" ")[1];
+        String username = req.getHeader("username");
+         
+        if(!utils.Authentication(authKey, username))
+        	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build();
+        if(!roles.checkPermissions(username, "T2"))
+        	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have the necessary permissions for this operation.").build();
+		 
 		Key trailKey = trailKeyFactory.newKey(data.trailName);
 		Entity trailEntity = datastore.get(trailKey);
 		if(trailKey == null || trailEntity == null)
