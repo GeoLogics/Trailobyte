@@ -42,7 +42,7 @@ public class LogoutResource {
 		String[] verifierTemp = req.getHeader("Authorization").split(" ");
 		String username = req.getHeader("username");
 
-		if(!util.Authentication(username, verifierTemp[1])) 
+		if(!util.Authentication(verifierTemp[1], username)) 
 			return Response.status(Status.FORBIDDEN).build();
 		
 		
