@@ -59,30 +59,24 @@ public class LogoutResource {
 				LOG.warning("Failed logout attempt for username: " + username);
 				return Response.status(Status.FORBIDDEN).build();
 			}	
-				
-				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username);
-				Entity tokenEntity = datastore.get(tokenKey);
 
-				if(tokenEntity == null) 
-					return Response.status(Status.NOT_FOUND).entity("Token not found .").build();
-				
-				tokenEntity = Entity.newBuilder(tokenKey)
-						.set("verifier", tokenEntity.getString("verifier"))
-						.set("creationData", tokenEntity.getLong("creationData"))
-						.set("expirationData", 0)
-						.build();
+			Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username);
+			Entity tokenEntity = datastore.get(tokenKey);
 
-				txn.put(tokenEntity);
-				txn.commit();
-				return Response.ok().build();
+			if(tokenEntity == null) 
+				return Response.status(Status.NOT_FOUND).entity("Token not found .").build();
 
-			}catch (Exception e) {
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();	
-			}
-			finally {
-				if(txn.isActive())
-					txn.rollback();
-			}
+			txn.delete(tokenKey);
+			txn.commit();
+			return Response.ok().build();
+
+		}catch (Exception e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();	
+		}
+		finally {
+			if(txn.isActive())
+				txn.rollback();
+		}
 	}
 
 }

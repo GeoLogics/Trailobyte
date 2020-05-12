@@ -67,8 +67,7 @@ public class LoginResource {
 							.set("creationData", token.creationData)
 							.set("expirationData", token.expirationData)
 							.build();
-					txn.put(tokenEntity);
-					
+					txn.add(tokenEntity);
 					txn.commit();
 					return Response.ok(g.toJson(token.verifier)).build();				
 

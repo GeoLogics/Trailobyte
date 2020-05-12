@@ -27,7 +27,7 @@ public class Init {
 	
 	@POST
 	@Path("/createAdmin")
-	public Response CreateADMIN() {
+	public Response createAdmin() {
 		Transaction txn = null;
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey("ADMIN");
 		
@@ -53,7 +53,7 @@ public class Init {
 		
 	@POST
 	@Path("/generateRoleTable")
-	public Response GenerateRoleTable() {
+	public Response generateRoleTable() {
 		RoleResource roles = new RoleResource();
 		return roles.createRolesTable();
 	}
