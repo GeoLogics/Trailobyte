@@ -27,7 +27,6 @@ import com.google.gson.Gson;
 
 import util.AuthToken;
 import util.LoginData;
-import util.Validity;
 
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -59,27 +58,18 @@ public class LoginResource {
 			if( user != null ) {
 				String hashedPWD = user.getString("user_pwd");
 				if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
-					Validity validity = new Validity();
-					AuthToken token = new AuthToken(data.username, "User", validity);
+					AuthToken token = new AuthToken(data.username);
 					LOG.info("User '" + data.username + "' logged in sucessfully.");
 
-
 					Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.username);
-					Entity tokenEntity = Entity.newBuilder(tokenKey).set("username", data.username).build();
-					txn.add(tokenEntity);
-
-					Key validityKey = datastore.newKeyFactory()
-							.addAncestor(PathElement.of("Token", data.username))
-							.setKind("Validity")
-							.newKey(data.username);
-
-					Entity validityEntity = Entity.newBuilder(validityKey).set("Validity", data.username)
-							.set("Verifier", validity.verifier)
-							.set("ExpirationData", validity.expirationData)
+					Entity tokenEntity = Entity.newBuilder(tokenKey)
+							.set("verifier", token.verifier)
+							.set("creationData", token.creationData)
+							.set("expirationData", token.expirationData)
 							.build();
-					txn.add(validityEntity);
+					txn.add(tokenEntity);
 					txn.commit();
-					return Response.ok(g.toJson(token)).build();				
+					return Response.ok(g.toJson(token.verifier)).build();				
 
 				} else {
 					LOG.warning("Wrong password for username: " + data.username);
