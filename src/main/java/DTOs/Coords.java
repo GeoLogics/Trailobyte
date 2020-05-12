@@ -1,4 +1,4 @@
-package util;
+package DTOs;
 
 public class Coords {
 	

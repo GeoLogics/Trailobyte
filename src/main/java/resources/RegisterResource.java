@@ -57,12 +57,10 @@ public class RegisterResource {
 			Entity user = Entity.newBuilder(userKey)
 					.set("user_pwd", DigestUtils.sha512Hex(data.password))
 					.set("user_email", data.email)
-					//.set("user_profile", data.profile == null ? "PRIVATE" : data.profile.toString())
 					.set("user_telephone", data.telephone == null ? "" : data.telephone)
 					.set("user_mobphone", data.mobilePhone == null ? "" : data.mobilePhone)
 					.set("user_address", data.address == null ? "" : data.address)
-					//.set("user_state", data.state == null ? "ACTIVE" : data.state.toString())
-					.set("user_role", data.role == null ? "E1" : data.role)
+					.set("user_role", "E1")
 					.set("user_creation_time", Timestamp.now())
 					.build();
 			datastore.add(user);

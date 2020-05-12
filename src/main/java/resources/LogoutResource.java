@@ -20,8 +20,6 @@ import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.Transaction;
 
-import util.Utils;
-
 
 
 @Path("/logout")
@@ -50,48 +48,41 @@ public class LogoutResource {
 		
 		LOG.fine("Attempt to logout user: " + username);
 
-
 		Key userKey = userKeyFactory.newKey(username);
-		Transaction txn = datastore.newTransaction();
+		Transaction txn = null;
 
 		try {
+			txn = datastore.newTransaction();
 			Entity user = txn.get(userKey);
 
-			if(user!= null) {
-
+			if(user == null) {
+				LOG.warning("Failed logout attempt for username: " + username);
+				return Response.status(Status.FORBIDDEN).build();
+			}	
+				
 				Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(username);
 				Entity tokenEntity = datastore.get(tokenKey);
 
+				if(tokenEntity == null) 
+					return Response.status(Status.NOT_FOUND).entity("Token not found .").build();
+				
 				tokenEntity = Entity.newBuilder(tokenKey)
-						.set("verifier", tokenEntity.getValue("verifier").get().toString())
-						.set("creationData", tokenEntity.getValue("creationData").get().toString())
+						.set("verifier", tokenEntity.getString("verifier"))
+						.set("creationData", tokenEntity.getLong("creationData"))
 						.set("expirationData", 0)
 						.build();
 
-
-
-				if(tokenEntity == null) {
-					txn.rollback();
-					return Response.status(Status.NOT_FOUND).entity("Token not found .").build();
-
-				}else
-					txn.put(tokenEntity);
+				txn.put(tokenEntity);
 				txn.commit();
 				return Response.ok().build();
 
+			}catch (Exception e) {
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();	
 			}
-			else {
-				LOG.warning("Failed logout attempt for username: " + username);
-				return Response.status(Status.FORBIDDEN).build();
+			finally {
+				if(txn.isActive())
+					txn.rollback();
 			}
-
-
-		}catch (Exception e) {
-			txn.rollback();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();	
-		}
-
-		
 	}
 
 }

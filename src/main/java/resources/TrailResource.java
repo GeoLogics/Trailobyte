@@ -73,7 +73,6 @@ import util.LongURL;
 import util.Marker;
 import util.Review;
 import util.Trail;
-import util.Utils;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -147,7 +146,7 @@ public class TrailResource {
 	        		//if it is, the trail is updated. if not, returns
 	        		if(datastore.get(trailKey) != null){ 
 	        			Key tokenKey = tokenKeyFactory.newKey(trail.creator);
-	        			if(authKey != datastore.get(tokenKey).getString("verifier"))
+	        			if(tokenKey == null || authKey != datastore.get(tokenKey).getString("verifier"))
 	        				return Response.status(Status.FORBIDDEN).entity("Trail '"+trail.name+"' already exists and this user is not it's creator").build();
 	        		}
 	        		//store markers list
@@ -221,7 +220,7 @@ public class TrailResource {
 	@POST
 	@Path("/verifytrail")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response verifyTrail(@Context HttpServletRequest req, @Context HttpServletResponse res, VerifyTrailObject data){
+	public Response verifyTrail(@Context HttpServletRequest req, @Context HttpServletResponse res, VerifyTrailObject data) throws ServletException{
 		Transaction txn = null;
 		
 		String authKey = req.getHeader("Authorization").split(" ")[1];
@@ -242,7 +241,7 @@ public class TrailResource {
 		if(userKey == null || userEntity == null)
 			return Response.status(Status.NOT_FOUND).entity("User '"+ data.userName +"' doesn´t exist.").build();
 		
-		
+		 
 		try {
 			 txn = datastore.newTransaction();
 			 
@@ -282,8 +281,17 @@ public class TrailResource {
 	@GET
 	@Path("/gettrail/{trailName}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getTrail(@PathParam("trailName")String trailName) throws JsonMappingException, JsonProcessingException {
+	public Response getTrail(@Context HttpServletRequest req, @Context HttpServletResponse res, @PathParam("trailName")String trailName) throws ServletException, JsonMappingException, JsonProcessingException {
 		
+		
+		String authKey = req.getHeader("Authorization").split(" ")[1];
+        String username = req.getHeader("username");
+         
+        if(!utils.Authentication(authKey, username))
+        	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build();
+        if(!roles.checkPermissions(username, "T2"))
+        	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have the necessary permissions for this operation.").build();
+		 
 		try {
 			Key trailKey = trailKeyFactory.newKey(trailName);
 			Entity trailEntity = datastore.get(trailKey);

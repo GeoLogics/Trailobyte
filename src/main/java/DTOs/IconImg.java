@@ -1,7 +1,4 @@
-package util;
-
-import DTOs.widthHeightObject;
-import DTOs.xyObject;
+package DTOs;
 
 public class IconImg {
 	

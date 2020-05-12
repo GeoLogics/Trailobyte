@@ -1,5 +1,8 @@
 package util;
 
+import DTOs.Coords;
+import DTOs.IconImg;
+
 public class Marker {
 	public String name;
 	public Coords coords;
