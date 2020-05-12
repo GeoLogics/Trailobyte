@@ -23,7 +23,6 @@ import com.google.cloud.datastore.Transaction;
 
 
 @Path("/logout")
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LogoutResource {
 
 	private static final Logger LOG = Logger.getLogger(LogoutResource.class.getName());
@@ -36,7 +35,6 @@ public class LogoutResource {
 	//XD?
 	@DELETE
 	@Path("/v1")
-	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLogout(@Context HttpServletRequest req) {
 
 		String[] verifierTemp = req.getHeader("Authorization").split(" ");
