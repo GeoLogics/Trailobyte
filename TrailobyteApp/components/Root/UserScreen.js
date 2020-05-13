@@ -1,23 +1,36 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import { StyleSheet, View, Image, TouchableOpacity, Animated, Easing } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity, Animated, Easing, Dimensions, PermissionsAndroid } from 'react-native';
 import { Actions, ActionConst } from 'react-native-router-flux';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import AsyncStorage from '@react-native-community/async-storage';
+import Geolocation from '@react-native-community/geolocation';
 
 import Wallpaper from './Wallpaper';
 
 import arrowImg from '../../images/left-arrow.png';
-
 import {targetUri as appEngineUri} from '../../app.json';
 
-const SIZE = 40;
+const {width, height} = Dimensions.get('window')
+
+const SCREEN_HEIGHT = height
+const SCREEN_WIDTH = width
+const ASPECT_RATIO = width / height
+const LATITUDE_DELTA = 0.0922
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
+const ITEM_SIZE = 40;
 
 export default class UserScreen extends React.Component {
     constructor() {
         super();
-
+        
         this.state = {
+            region: {
+                latitude: 0,
+                longitude: 0,
+                latitudeDelta: 0,
+                longitudeDelta: 0,
+            },
             isLoading: false,
             username: '',
             verifier: ''
@@ -25,7 +38,59 @@ export default class UserScreen extends React.Component {
 
         this._onPress = this._onPress.bind(this);
         this.growAnimated = new Animated.Value(0);
+        
+        if (Platform.OS === "android") {
+            this.requestLocationPermission();
+        }
+        
+        Geolocation.getCurrentPosition(
+            (position) => {
+                var lat = parseFloat(position.coords.latitude);
+                var long = parseFloat(position.coords.longitude);
+                
+                var currentRegion = {
+                    latitude: lat,
+                    longitude: long,
+                    latitudeDelta: LATITUDE_DELTA,
+                    longitudeDelta: LONGITUDE_DELTA,
+                }
+
+                this.setState({region: currentRegion});
+            },
+            (error) => {
+                console.log(error.code, error.message);
+                throw error;
+            },
+            {
+                showLocationDialog: true,
+                forceRequestLocation: true, 
+                enableHighAccuracy: true, 
+                timeout: 15000 
+            }
+        );
     }
+    
+    async requestLocationPermission() {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    title: "Access Location Permission",
+                    message: "Trailobyte needs access to your location.",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK"
+                }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                this.setState({hasLocationPermission: true});
+            } else {
+                this.setState({hasLocationPermission: false});
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    };
 
     _onPress() {
         if (this.state.isLoading) return;
@@ -95,7 +160,7 @@ export default class UserScreen extends React.Component {
     render() {
         const changeScale = this.growAnimated.interpolate({
             inputRange: [0, 1],
-            outputRange: [1, SIZE],
+            outputRange: [1, ITEM_SIZE],
         });
         
         return (
@@ -103,17 +168,11 @@ export default class UserScreen extends React.Component {
                 <View style={styles.container}>
                     <MapView
                         style={styles.map}
-                        provider={PROVIDER_GOOGLE}
-                        showsUserLocation={true}
-                        showsMyLocationButton={false}
-                        zoomEnabled={true}
-                        loadingEnabled={true}
-                        region={{
-                            latitude: 37.78825,
-                            longitude: -122.4324,
-                            latitudeDelta: 0.015,
-                            longitudeDelta: 0.0121,
-                        }}>
+                        region={this.state.region}
+                        onRegionChangeComplete={ region => {
+                            this.setState({region});
+                        }}
+                        showsUserLocation={ true } >
                     </MapView>
                     <TouchableOpacity
                         onPress={this._onPress}
@@ -145,16 +204,16 @@ const styles = StyleSheet.create({
     button: {
         alignItems: 'center',
         justifyContent: 'center',
-        width: SIZE,
-        height: SIZE,
+        width: ITEM_SIZE,
+        height: ITEM_SIZE,
         borderRadius: 100,
         zIndex: 99,
         backgroundColor: '#555555',
     },
     circle: {
-        height: SIZE,
-        width: SIZE,
-        marginTop: -SIZE,
+        height: ITEM_SIZE,
+        width: ITEM_SIZE,
+        marginTop: -ITEM_SIZE,
         borderRadius: 100,
         backgroundColor: '#555555',
     },
