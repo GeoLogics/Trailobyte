@@ -5,4 +5,4 @@ project.bucket=
 project.id=trailobyte-275015
 project.previousVersion.stop=true
 project.promote=true
-project.version=prebeta
+project.version=alpha

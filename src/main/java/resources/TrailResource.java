@@ -289,7 +289,7 @@ public class TrailResource {
          
         if(!utils.Authentication(authKey, username))
         	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build();
-        if(!roles.checkPermissions(username, "T2"))
+        if(!roles.checkPermissions(username, "T3"))
         	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have the necessary permissions for this operation.").build();
 		 
 		try {
