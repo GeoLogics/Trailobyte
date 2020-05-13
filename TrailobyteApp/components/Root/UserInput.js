@@ -17,6 +17,7 @@ export default class UserInput extends React.Component {
                     autoCorrect={this.props.autoCorrect}
                     autoCapitalize={this.props.autoCapitalize}
                     returnKeyType={this.props.returnKeyType}
+                    onChangeText={this.props.onChangeText}
                     placeholderTextColor="white"
                     underlineColorAndroid="transparent"
                 />
@@ -32,6 +33,7 @@ UserInput.propTypes = {
     autoCorrect: PropTypes.bool,
     autoCapitalize: PropTypes.string,
     returnKeyType: PropTypes.string,
+    onChangeText: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -46,6 +48,7 @@ const styles = StyleSheet.create({
     },
     inputWrapper: {
         flex: 1,
+        marginTop: 20,
     },
     inlineImg: {
         position: 'absolute',

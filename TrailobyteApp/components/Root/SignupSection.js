@@ -19,9 +19,7 @@ export default class SignupSection extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        top: -20,
-        width: DEVICE_WIDTH,
-        height: DEVICE_HEIGHT,
+        top: 20,
         flexDirection: 'row',
         justifyContent: 'space-around',
     },

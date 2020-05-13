@@ -26,6 +26,8 @@ export default class LoginButton extends React.Component {
         if (this.state.isLoading) return;
 
         this.setState({isLoading: true});
+        this.props.doLogin();
+        
         Animated.timing(this.buttonAnimated, {
             toValue: 1,
             duration: 200,
@@ -38,7 +40,9 @@ export default class LoginButton extends React.Component {
         }, 2000);
 
         setTimeout(() => {
-            Actions.userScreen();
+            if (this.props.isLoggedIn()) {
+                Actions.userScreen();
+            }
             this.setState({isLoading: false});
             this.buttonAnimated.setValue(0);
             this.growAnimated.setValue(0);
@@ -87,7 +91,7 @@ export default class LoginButton extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        top: -50,
+        top: -10,
         alignItems: 'center',
         justifyContent: 'flex-end',
     },

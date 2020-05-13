@@ -16,19 +16,23 @@ const DEVICE_HEIGHT = Dimensions.get('window').height;
 export default class UserForm extends React.Component {
     constructor(props) {
         super(props);
-            this.state = {
-                showPass: true,
-                press: false,
-            };
+        
+        this.state = {
+            showPass: true,
+            press: false,
+            username: '',
+            password: ''
+        };
+        
         this.showPass = this.showPass.bind(this);
     }
-
+    
     showPass() {
         this.state.press === false
             ? this.setState({showPass: false, press: true})
             : this.setState({showPass: true, press: false});
     }
-
+    
     render() {
         return (
             <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} style={styles.container}>
@@ -38,6 +42,7 @@ export default class UserForm extends React.Component {
                     autoCapitalize={'none'}
                     returnKeyType={'done'}
                     autoCorrect={false}
+                    onChangeText={(text) => this.setState({username: text})}
                 />
                 <UserInput
                     source={passwordImg}
@@ -46,6 +51,7 @@ export default class UserForm extends React.Component {
                     returnKeyType={'done'}
                     autoCapitalize={'none'}
                     autoCorrect={false}
+                    onChangeText={(text) => this.setState({password: text})}
                 />
                 <TouchableOpacity
                     activeOpacity={0.7}
@@ -64,9 +70,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     btnEye: {
-        position: 'relative',
-        top: -45,
-        left: 155,
+        top: -26,
+        left: 150,
     },
     iconEye: {
         width: 25,

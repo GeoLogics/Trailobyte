@@ -1,13 +1,13 @@
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
-import Login from "./components/Login";
+import Root from "./components/Root";
 
 export default class App extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <Login />
+                <Root />
             </View>
         );
     }
