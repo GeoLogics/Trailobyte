@@ -1,4 +1,5 @@
-.headerhome{
+
+.headerapp{
     background-image: url('/imagens/caminhada1.jpg');
     background-size: cover;
     background-position: center;
@@ -7,13 +8,13 @@
     position: relative;
 }
 
-.header-text{
+.headerapp-text{
     margin-top: 10%;
     position: absolute;
 }
 
 
-.headerhome a{
+.headerapp a{
     color: white;
     font-size: 5vw;
     width: auto;
@@ -21,7 +22,7 @@
 }
 
 
-.content{
+.contentapp{
     background-image: url('/imagens/montanhas (1).jpg');
     background-size: cover;
     background-position: center;
@@ -32,7 +33,7 @@
 }
 
 
- .home ul {
+  .app ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -41,19 +42,24 @@
     position: sticky;
   }
   
- .home li {
+ .app li {
     float: left;
   }
   
- .home li a {
+ .app li a {
     display: block;
     color: white;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
   }
+
+  .applogin{
+    float: right;
+  }
   
   /* Change the link color to #111 (black) on hover */
- .home li a:hover {
+ .app li a:hover {
     background-color: #111;
   }
+

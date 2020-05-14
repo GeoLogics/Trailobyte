@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import '../app/App.css';
 import './login.css';
 import { withRouter } from "react-router-dom";
 import history from '../../history';
@@ -43,7 +42,7 @@ class login extends Component {
         return this.setState({ error: '' });
     }
 
-    gotoApp(){ // falta tratamento do token
+    gotoHome(){ // falta tratamento do token
         history.push("/home");
     }
 
@@ -55,34 +54,48 @@ class login extends Component {
         this.setState({password: event.target.value});
     }
 
+    gotoApp(){
+        history.push("/");
+    }
+
     async login(username, password){ 
-        await fetch('http://localhost:8080/rest/login/v1', {
+        await fetch('https://trailobyte-275015.ew.r.appspot.com/rest/login/v1', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 username: username,
                 password: password
             })
         })
-        .then(function(response){ console.log(response)  ;return response.json(); })
-        .then(function(data) {
-            console.log( data)
-            const token = data.token;
-            console.log(token)
-            localStorage.removeItem("token");
-            if(token != null){
-                localStorage.setItem("token",token);
+
+        .then(function(response){
+            if(response.ok){
+                return response.json();
             }
         })
-        this.gotoApp();
+        .then(function(data){
+            console.log(data);
+            var key = data;
+            console.log(data);
+            console.log(key);
+            localStorage.removeItem("key");
+            localStorage.removeItem("username");
+            if(key != null){
+                localStorage.setItem("key",key);
+                localStorage.setItem("username",username);
+            }
+        })
+        this.gotoHome();
         
         }
 
     render(){
         return(
             <div className="login">
+                <button onClick={this.gotoApp}>Back</button>
                 <form onSubmit={this.submit}>
                     {
                         this.state.error &&

@@ -4,6 +4,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker, DirectionsRenderer} fro
 import { withRouter } from "react-router-dom";
 import './MapTest5.css';
 import history from '../../history';
+import _ from 'lodash';
 
 
 const Map = withScriptjs(
@@ -38,6 +39,7 @@ class MapTest5 extends Component {
         marksstopat: [],
         directions: null,
         error: '',
+        dist: '',
     };
 
     DefaultError = () => {
@@ -51,18 +53,16 @@ class MapTest5 extends Component {
         this.changeDescMarker();
         this.changeNameMarker();
 
-        var asd = this.constructorMarker();
-        console.log(asd);
 
         if(!this.state.name){
             return this.setState({error: 'Name invalid'});
         }
 
         if(!this.state.creator){
-            return this.setState({error: 'Password invalid'});
+            return this.setState({error: 'Creator invalid'});
         }
 
-        if(!this.state.marks){
+        if(!this.state.directions){
             return this.setState({error: 'No waypoints'});
         }
         
@@ -93,6 +93,9 @@ class MapTest5 extends Component {
         this.setState({
             marks: [],
             directions: null,
+            marksname: [],
+            marksdesc: [],
+            marksstopat: [],
         });
         this.removeMarkerListAll();
     };
@@ -133,6 +136,10 @@ class MapTest5 extends Component {
               this.setState({
                 directions: result,
               });
+              let distance = _.flatMap(result.routes, route => _.flatMap(route.legs, leg => leg.distance.value));  
+              let sum = _.sum(distance);
+              sum = sum/1000;
+              this.setState({dist:sum});
             } else {
               console.error(`error fetching directions ${result}`);
             }
@@ -254,7 +261,14 @@ class MapTest5 extends Component {
         history.push("/home");
     }
 
+    gotoback = () => {
+        history.goBack();
+    }
+
     constructorMarker = () =>{
+        this.changeDescMarker();
+        this.changeNameMarker();
+        this.changeStopAt();
         var markers = [];
         for(let i=0; i<Object.keys(this.state.marks).length;i++){
             var temp = {
@@ -273,9 +287,10 @@ class MapTest5 extends Component {
     }
 
 
-    async postTrail(name,description,creator,marks,marksname,marksdesc,marksstopat){
-        var formdata = new FormData();
-        formdata.append("json","");
+    async postTrail(name,description,creator,marksname,dist){
+        const username = localStorage.getItem("username");
+        const key = localStorage.getItem("key");
+        var markers = this.constructorMarker();
         var json = {
             name: name,
             description: description,
@@ -283,16 +298,29 @@ class MapTest5 extends Component {
             creator: creator,
             start: marksname[0],
             end: marksname[Object.keys(this.state.marks).length-1],
-            
+            markers: markers,
+            avgRating: 0.0,
+            nRatings: 0,
+            dist: dist,
+            verified: 'false',
         };
-        await fetch('post', {
+
+        var headers = new Headers();
+        headers.append('username', username);
+        headers.append('Authorization','Bearer '+key,);
+
+        var formdata = new FormData();
+        formdata.append("json",json);
+        console.log(json);
+
+        var requestOptions = {
             method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-            },
+            headers: headers,
             body: formdata,
-        })
-        .then(function(response){ return response.ok; })
+            redirect: 'follow'
+          };
+        await fetch('https://trailobyte-275015.ew.r.appspot.com/rest/trail/posttrail', requestOptions)
+        .then(function(response){ if(response.ok) return; })
         this.gotoApp();
         
         }
@@ -300,9 +328,9 @@ class MapTest5 extends Component {
     render() {
         return (
             <div style={{width:'100vw', height:'100vh'}}>
-                <button onClick={this.deleteMarkS}>DELETE MARKS</button>
+                <button onClick={this.gotoback} id="backbutton">Back</button>
                 <div id="barra">
-                <form onSubmit={this.submit}>
+                
                     {
                         this.state.error &&
                         <h3 data-test="error" onClick={this.DefaultError}>
@@ -310,27 +338,28 @@ class MapTest5 extends Component {
                             {this.state.error}
                         </h3>
                     }
-                    <input type="submit" onClick ={this.cenas} value = "Submit"/>
-                    <ul>
+                    <input type="submit" onClick ={() => this.postTrail(this.state.name,this.state.description,this.state.creator,this.state.marksname,this.state.dist)} value = "Submit"/>
+            
+                    <button onClick={this.deleteMarkS}>Delete all markers</button>
+                    <ul className="map">
                         <li style={{clear:'both'}}>
                             <a>Click on Map to add waypoints</a>
                         </li>
                         <li style={{clear:'both'}}>
-                            <a>Right Click on the waypoint to remove</a>
+                            <a>Click on the waypoint to remove</a>
                         </li>
                         <li style={{clear:'both'}}>
                             <a>You can add waypoint only for the purpose of passing by</a>
                         </li>
                     </ul>
                     <ul>
-                        <input type="text" placeholder="Trail name" id="trailname" value = {this.state.name} onChange={this.changeName}></input>
-                        <input type="text" placeholder="Description" id="description" value = {this.state.description} onChange={this.changeDescription}></input>
-                        <input type="text" placeholder="Creator" id="creator" value = {this.state.creator} onChange={this.changeCreator}></input>
+                        <input type="text" placeholder="Trail name" id="trailname" value = {this.state.name} onChange={this.changeName} className="map"></input>
+                        <input type="text" placeholder="Description" id="description" value = {this.state.description} onChange={this.changeDescription} className="map"></input>
+                        <input type="text" placeholder="Creator" id="creator" value = {this.state.creator} onChange={this.changeCreator} className="map"></input>
                     </ul>
-                    </form>
                 </div>
                 <Map
-                    googleMapURL="http://maps.googleapis.com/maps/api/js?key=AIzaSyD2HdYk7gSqjAnTchqAL4EilOOBWLjPExA"
+                    googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2HdYk7gSqjAnTchqAL4EilOOBWLjPExA"
                     loadingElement={<div style={{ height: `100%` }} />}
                     containerElement={<div style={{ height: `100%` }} />}
                     mapElement={<div style={{ height: `100%` }} />}
