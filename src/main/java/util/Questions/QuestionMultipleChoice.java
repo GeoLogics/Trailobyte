@@ -3,7 +3,7 @@ package util.Questions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class QuestionMultipleChoise {
+public class QuestionMultipleChoice {
 	
 	public String enunciated;
 	public String question;
@@ -15,7 +15,7 @@ public class QuestionMultipleChoise {
 	public int id;
 	
 	@JsonCreator
-	public QuestionMultipleChoise(@JsonProperty("enunciated") String enunciated,
+	public QuestionMultipleChoice(@JsonProperty("enunciated") String enunciated,
 									@JsonProperty("question") String question, 
 									@JsonProperty("optionA") String optionA, 
 									@JsonProperty("optionB") String optionB,

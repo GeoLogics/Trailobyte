@@ -79,15 +79,12 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-
-
 @Path("/trail")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class TrailResource {
 
 	//A Logger Object
 	private static final Logger LOGGER = Logger.getLogger(LoginResource.class.getName());
-	
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final Storage storage = StorageOptions.newBuilder().setProjectId("trailobyte-275015").build().getService();
 	private final KeyFactory trailKeyFactory = datastore.newKeyFactory().setKind("Trail");
@@ -96,16 +93,11 @@ public class TrailResource {
 	private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
 	private final RoleResource roles = new RoleResource();
 	private final Utils utils = new Utils();
-
 	private final Gson g = new Gson();
-	
-	
-	
 	
 	public TrailResource() {
 		
 	}
-	
 	
 	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
 	//OP_CODE: T1
@@ -212,8 +204,6 @@ public class TrailResource {
 		}
 	    return null;
 	   }
-
-
 	
 	//ROLES: E2, E4, BO, BOT, ADMIN
 	//OP_CODE: T2
@@ -289,7 +279,7 @@ public class TrailResource {
          
         if(!utils.Authentication(authKey, username))
         	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build();
-        if(!roles.checkPermissions(username, "T2"))
+        if(!roles.checkPermissions(username, "T3"))
         	 return Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have the necessary permissions for this operation.").build();
 		 
 		try {
@@ -319,7 +309,9 @@ public class TrailResource {
 			ObjectMapper mapper = new ObjectMapper();
 	     	List<Marker> markerList = mapper.readValue(data, new TypeReference<List<Marker>>(){});
 	     	
-			Trail trail = new Trail(name, description, trailImg, creator, start, end, markerList, avgRating, nRatings, dist, verified);
+	     	//VER COMO È QUE SE FAZ EM RELAÇÂO ÀS PERGUNTAS
+	     	//TODO:
+			Trail trail = new Trail(name, description, trailImg, creator, start, end, markerList, null, avgRating, nRatings, dist, verified);
 			
 			return Response.ok(g.toJson(trail)).build();
 			
@@ -402,12 +394,5 @@ public class TrailResource {
 		}
 		return null;
 	}
-
-		
-	
-
-	
-
-	
 	
 }

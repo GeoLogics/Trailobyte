@@ -16,7 +16,7 @@ import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
-import util.Questions.QuestionMultipleChoise;
+import util.Questions.QuestionMultipleChoice;
 
 @Path("/ValidateQuestion")
 public class ValidateQuestionResource {

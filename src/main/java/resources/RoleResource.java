@@ -142,9 +142,6 @@ public class RoleResource {
 		}
 	}
 	
-	
-	
-	
 	public boolean checkPermissions(String userName, String method) {
 		
 		Key userKey = userKeyFactory.newKey(userName);
