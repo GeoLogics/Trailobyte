@@ -1,0 +1,82 @@
+.quizzDo {
+    background-image: url('/imagens/montanha.jpg');
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+    min-width: 70em;
+    min-height: 60.55em;
+    position: absolute;
+    background-attachment: fixed;
+}
+
+.allQuestions{
+    background-image: url('/imagens/montanha.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.quizzDo h2{
+    text-align: center;
+    font-size: xx-large;
+    margin-top: 10%;
+    color: white;
+    margin-left: -9%;
+}
+
+.quizzDo h1{
+    text-align: center;
+    font-size: 500%;
+    margin-top: 10%;
+    color: white;
+    margin-left: -9%;
+}
+
+
+.quizzDo form{
+    width: auto;  
+    height: auto;
+}
+
+.submitQuizzDo{
+    margin-left:30%;
+    margin-top: 5%;
+}
+
+.submitQuizzDo a{
+    color:white;
+}
+
+.submitQuizzDo p{
+    color: white;
+    font-size: large;
+}
+
+
+
+.quizzDo button{
+    background-color: #555555; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+  }
+
+ .quizzDo input[type=submit]{
+    background-color: #555555; 
+    border: none;
+    color: rgb(248, 248, 248);
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 76%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+  }
+

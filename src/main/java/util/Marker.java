@@ -11,11 +11,12 @@ public class Marker {
 	public String imgURL;
 	public IconImg iconImg;
 	public boolean stopover;
+	public boolean dangerZone;
 	
 	public Marker() {}
 	
 	
-	public Marker (String name, Coords coords, String type, String content, String imgURL, IconImg iconImg, boolean stopover) {
+	public Marker (String name, Coords coords, String type, String content, String imgURL, IconImg iconImg, boolean stopover, boolean dangerZone) {
 		this.name = name;
 		this.coords = coords;
 		this.type= type;
@@ -23,6 +24,7 @@ public class Marker {
 		this.imgURL = imgURL;
 		this.iconImg =  iconImg;
 		this.stopover = stopover;
+		this.dangerZone =  dangerZone;
 	}
 
 }

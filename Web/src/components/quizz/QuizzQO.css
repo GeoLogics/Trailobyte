@@ -1,0 +1,136 @@
+/*.QuizzQO {
+    background-image: url('/imagens/montanha.jpg');
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+    min-width: 70em;
+    min-height: 60.55em;
+    position: relative;
+    background-attachment: fixed;
+
+}
+*/
+.QuizzQO h2{
+    text-align: center;
+    font-size: xx-large;
+    padding-top: 5%;
+    margin-top: 0px;
+    color: white;
+   /* position: relative;*/
+}
+
+.QuizzQO input[type=text]{
+    text-align: left;
+    margin-right: 4em;
+    border: 2px solid rgb(56, 53, 53);
+    box-sizing: border-box;
+    padding: 7px 10px;
+    margin: 15px 0px;
+    margin-left: 4%;
+    width: 67%;
+    overflow:scroll;
+    position: relative;
+    /*overflow-x:none;*/
+    /*resize:none;*/
+}
+
+
+.QuizzQO input[type=text]:focus{
+    border: 2px solid rgb(0, 0, 0);
+    background-color: slategray;
+}
+.QuizzQO form{
+    width: auto;  
+    height: auto;
+}
+
+.enunciatedQOQuizz textarea {
+    text-align: left;
+    margin-right: 4em;
+    border: 2px solid rgb(56, 53, 53);
+    box-sizing: border-box;
+    padding: 7px 10px;
+    margin: 15px 0px;
+    margin-left: 15%;
+    width: 70%;
+
+    font-family: Arial;
+
+    resize: none;
+    /*width: auto;  
+    height: auto;*/
+}
+
+.enunciatedQOQuizz textarea:focus{
+border: 2px solid rgb(0, 0, 0);
+background-color: slategray;
+}
+
+
+
+.submitQuestion{
+    margin-left:12%;
+    margin-top: 1.2%;
+}
+
+.submitQuestion a{
+    color:white;
+}
+
+.submitQuestion p{
+    color: white;
+    font-size: large;
+}
+
+.submitQuestion input[type=submit]{
+  background-color: #555555; 
+  border: none;
+  color: rgb(248, 248, 248);
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.QuizzQO #QOQuizz{
+    text-align: left;
+    margin-right: 4em;
+    border: 2px solid rgb(56, 53, 53);
+    box-sizing: border-box;
+    padding: 7px 10px;
+    margin: 15px 0px;
+    margin-left: 5%;
+    width: 70%;
+    overflow:scroll;
+    position: relative;
+    /*overflow-x:none;*/
+    /*resize:none;*/
+}
+
+
+.QuizzQO #QOQuizz:focus{
+    border: 2px solid rgb(0, 0, 0);
+    background-color: slategray;
+}
+
+.QuizzQO #orderOfPostQuizz{
+    margin-left: 10%;
+}
+
+.QuizzQO #AQuizzE{
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    margin-left: 16%;
+}
+
+
+
+.QuizzQO #AQuizzQ{
+    font-size: 17px;
+    color: white;
+    font-weight: bold;
+    margin-left: 5%;
+}

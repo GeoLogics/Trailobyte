@@ -26,6 +26,7 @@ import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
 import util.AuthToken;
+import util.CacheToken;
 import util.LoginData;
 
 @Path("/login")
@@ -44,6 +45,51 @@ public class LoginResource {
 	public LoginResource() { }
 
 
+	/*@POST
+	@Path("/v1")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response doLogin1(LoginData data) {
+		LOG.fine("Attempt to login user: " + data.username);
+
+		Key userKey = userKeyFactory.newKey(data.username);
+		Transaction txn = datastore.newTransaction();
+
+		try {
+			Entity user = txn.get(userKey);
+			if( user != null ) {
+				String hashedPWD = user.getString("user_pwd");
+				if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
+					AuthToken token = new AuthToken(data.username);
+					LOG.info("User '" + data.username + "' logged in sucessfully.");
+
+					Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.username);
+					Entity tokenEntity = Entity.newBuilder(tokenKey)
+							.set("verifier", token.verifier)
+							.set("creationData", token.creationData)
+							.set("expirationData", token.expirationData)
+							.build();
+					txn.add(tokenEntity);
+					txn.commit();
+					return Response.ok(g.toJson(token.verifier)).build();				
+
+				} else {
+					LOG.warning("Wrong password for username: " + data.username);
+					return Response.status(Status.FORBIDDEN).build();				
+				}
+			}
+			else {
+				// Username does not exist
+				LOG.warning("Failed login attempt for username: " + data.username);
+				return Response.status(Status.FORBIDDEN).build();
+			}
+
+		} catch (Exception e) {
+			txn.rollback();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+
+	}*/
+	
 	@POST
 	@Path("/v1")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -75,6 +121,10 @@ public class LoginResource {
 					LOG.warning("Wrong password for username: " + data.username);
 					return Response.status(Status.FORBIDDEN).build();				
 				}
+				
+				
+				
+				
 			}
 			else {
 				// Username does not exist

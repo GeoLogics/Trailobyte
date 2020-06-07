@@ -2,8 +2,10 @@ package resources;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +19,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -47,6 +50,7 @@ import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.EntityQuery;
+import com.google.cloud.datastore.IncompleteKey;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.KeyFactory;
 
@@ -60,6 +64,7 @@ import com.google.cloud.datastore.Value;
 import com.google.cloud.datastore.StructuredQuery.CompositeFilter;
 import com.google.cloud.datastore.StructuredQuery.OrderBy;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
+import com.google.cloud.datastore.Batch;
 import com.google.cloud.datastore.Cursor;
 
 import com.google.gson.Gson;
@@ -68,11 +73,13 @@ import com.google.gson.JsonParser;
 import com.google.protobuf.ByteString;
 
 import DTOs.QueryData;
+import DTOs.QueryResult;
 import DTOs.VerifyTrailObject;
 import util.LongURL;
 import util.Marker;
 import util.Review;
 import util.Trail;
+import util.TrailQuestion;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -91,8 +98,10 @@ public class TrailResource {
 	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 	private final KeyFactory reviewKeyFactory = datastore.newKeyFactory().setKind("Review");
 	private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
+	
 	private final RoleResource roles = new RoleResource();
 	private final Utils utils = new Utils();
+	private final QueryResource queries = new QueryResource();
 	private final Gson g = new Gson();
 	
 	public TrailResource() {
@@ -203,7 +212,7 @@ public class TrailResource {
 				txn.rollback();
 		}
 	    return null;
-	   }
+	}
 	
 	//ROLES: E2, E4, BO, BOT, ADMIN
 	//OP_CODE: T2
@@ -395,4 +404,294 @@ public class TrailResource {
 		return null;
 	}
 	
+	
+
+	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
+	//OP_CODE: T5
+	@POST
+	@Path("/posttrailquestions/{trailName}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response postTrailQuestions(@Context HttpServletRequest req, @Context HttpServletResponse res,  @PathParam("trailName")String trailName, List<TrailQuestion> questions) throws FileUploadException, IOException  {
+		
+		String userName = req.getHeader("username");
+		Key userKey = userKeyFactory.newKey(userName);
+		
+        Batch batch = null;
+        Key trailKey = null;
+        Entity trailEntity = null;
+        TrailQuestion trailQuestion = null;
+		
+		Entity userEntity = datastore.get(userKey);
+		
+		if(userEntity ==  null)
+			return Response.status(Status.NOT_FOUND).entity("User " + userName + " does not exist.").build();
+		
+		int verificationLevel = 0;
+		
+		switch(userEntity.getString("user_role")) {
+			case "E2" : verificationLevel = 1; break;
+			case "E3" : verificationLevel = 1; break;
+			case "E4" :	verificationLevel = 1; break;
+			case "BO" : verificationLevel = 2; break;
+			default	  : verificationLevel = 0; break;
+		}
+		
+        Iterator<TrailQuestion> iterator = questions.iterator();
+       
+        KeyFactory questionKeyFactory = datastore.newKeyFactory().addAncestors(PathElement.of("Trail", trailName)).setKind("TrailQuestion");
+        
+        if(trailName == null) 
+			return Response.status(Status.BAD_REQUEST).entity("Resquest doesnt contain a trailName").build();
+        
+        List<Marker> markersList =  getMarkersList(trailName);
+        if(markersList == null)
+        	return Response.status(Status.BAD_REQUEST).entity("Trail does not contain markers").build();
+        
+        trailKey = trailKeyFactory.newKey(trailName);
+		trailEntity = datastore.get(trailKey);
+		
+		if(trailEntity == null)
+			return Response.status(Status.BAD_REQUEST).entity("Trail '"+ trailName +"' given, does not exist.").build();
+        
+        try {
+        	batch = datastore.newBatch();
+        	while(iterator.hasNext()) {
+        		trailQuestion = (TrailQuestion) iterator.next();
+	        	
+	        	if(trailQuestion == null) 
+	        		return Response.status(Status.BAD_REQUEST).entity("Invalid file type received").build();
+	        	
+        		if(!containsMarkerName(markersList, trailQuestion.markerName))
+        			return Response.status(Status.BAD_REQUEST).entity("Marker associated with question does not exist").build();
+        		
+        		if(!trailName.equals(trailQuestion.trailName))
+        			return Response.status(Status.BAD_REQUEST).entity("Trail '"+ trailQuestion.trailName +"' in current question, differs from Trail: '"+ trailName+"' from previous questions.").build();
+        		
+        		String keyString = String.valueOf(Math.random());
+        		Key questionKey = questionKeyFactory.newKey(keyString); 
+        		
+        		
+        		Random generator = new Random();//delete
+        		
+        		Entity questionEntity = Entity.newBuilder(questionKey)
+        				.set("questionKey", keyString)
+    					.set("author", userName)
+    					.set("trailName", trailQuestion.trailName)
+    					.set("markerName", trailQuestion.markerName)
+    					//.set("verificationLevel", (int) verificationLevel)
+    					.set("verificationLevel", (int) generator.nextInt(5)) //delete
+    					
+    					.set("question", trailQuestion.question)
+    					.set("optionA", trailQuestion.optionA)
+    					.set("optionB", trailQuestion.optionB)
+    					.set("optionC", trailQuestion.optionC)
+    					.set("optionD", trailQuestion.optionD)
+    					.set("answer", trailQuestion.answer)
+    					.build();
+    					
+	        	batch.add(questionEntity);	 
+	        	 
+			 }
+        	 batch.submit();
+			 return Response.ok("{}").build();
+					
+		  }catch(Exception e) {
+				 e.printStackTrace();
+		  }
+		  finally{
+			  
+			if(batch.isActive())
+				((Transaction) batch).rollback();
+		  }
+	      return null;
+	}
+	
+	
+	private TrailQuestion getTrailQuestion(String trailName, String key) {
+		
+		KeyFactory questionKeyFactory = datastore.newKeyFactory().addAncestors(PathElement.of("Trail", trailName)).setKind("TrailQuestion");
+		
+		Key questionKey = questionKeyFactory.newKey(key); 
+		
+		Entity questEnt = datastore.get(questionKey);
+		
+		return new TrailQuestion(
+				questEnt.getString("questionKey"), 
+				questEnt.getString("author"),
+				questEnt.getString("trailName"),
+				questEnt.getString("markerName"),
+				(int) questEnt.getDouble("verificationLevel"),
+				questEnt.getString("question"),
+				questEnt.getString("optionA"),
+				questEnt.getString("optionB"),
+				questEnt.getString("optionC"),
+				questEnt.getString("optionD"),
+				questEnt.getString("answer")
+				);
+	}
+	
+	
+	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
+	//OP_CODE: T6
+	@POST
+	@Path("/verifytrailquestion/{trailName}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response verifyTrailQuestion(@Context HttpServletRequest req, @Context HttpServletResponse res,  @PathParam("trailName")String trailName, String questionKeyString) throws FileUploadException, IOException  {
+		
+		KeyFactory questionKeyFactory = datastore.newKeyFactory().addAncestors(PathElement.of("Trail", trailName)).setKind("TrailQuestion");
+		
+		String userName = req.getHeader("username");
+		
+		Key userKey = userKeyFactory.newKey(userName);
+		
+		Entity userEntity = datastore.get(userKey);
+		
+		Key questionKey = questionKeyFactory.newKey(questionKeyString);
+		
+		Entity questionEntity = datastore.get(questionKey);
+		
+		int verificationLevel = 0;
+		
+		if(userEntity ==  null)
+			return Response.status(Status.NOT_FOUND).entity("User " + userName + " does not exist.").build();
+		
+		 if(trailName == null) 
+				return Response.status(Status.BAD_REQUEST).entity("Resquest doesnt contain a trailName").build();
+		
+		 
+		 //ver melhor como é que isto fica
+		switch(userEntity.getString("user_role")) {
+			case "E2" : verificationLevel = 1; break;
+			case "E3" : verificationLevel = 1; break;
+			case "E4" :	verificationLevel = 1; break;
+			case "BO" : verificationLevel = 2; break;
+			default	  : verificationLevel = 0; break;
+		}
+		
+		if((int) questionEntity.getDouble("verificationLevel") >= verificationLevel)
+			return Response.status(Status.BAD_REQUEST).entity("User does not have permissions to change verification level").build();
+		Transaction txn = null;
+        try {
+        	txn =  datastore.newTransaction();
+        	
+        	
+    		Entity newQuestionEntity = Entity.newBuilder(questionKey)
+    				.set("questionKey", questionEntity.getString("questionKey"))
+					.set("author", questionEntity.getString("author"))
+					.set("trailName", questionEntity.getString("trailName"))
+					.set("markerName", questionEntity.getString("markerName"))
+					.set("verificationLevel", verificationLevel)
+					
+					.set("question", questionEntity.getString("question"))
+					.set("optionA", questionEntity.getString("optionA"))
+					.set("optionB", questionEntity.getString("optionB"))
+					.set("optionC", questionEntity.getString("optionC"))
+					.set("optionD", questionEntity.getString("optionD"))
+					.set("answer", questionEntity.getString("answer"))
+					.build();
+    		 
+	         txn.put(newQuestionEntity); 
+    		 return Response.ok("{}").build();
+    		 
+          }catch(Exception e) {
+				 e.printStackTrace();
+		  }
+		  finally{
+			if(txn.isActive())
+				txn.rollback();
+			
+		  }
+	      return null;	
+	}
+	
+	
+	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
+	//OP_CODE: T7
+	@POST
+	@Path("/getTrailQuizz/{trailName}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTrailQuizz(@Context HttpServletRequest req, @Context HttpServletResponse res,  QueryData queryData, @PathParam("trailName")String trailName) throws FileUploadException, IOException  {
+		//WARNING: this beautiful piece of code is the most eficient thing ever made. 
+		//you are strongly advised not to read it. procead at your own discretion
+		
+		if(trailName == null) 
+			return Response.status(Status.BAD_REQUEST).entity("null trailName").build();
+	
+		
+		try {
+			List<String> markersList =  getMarkersNamesList(trailName);
+			
+			List<List<TrailQuestion>> questionsList = new ArrayList<>(markersList.size());
+			
+			for(int i = 0; i < markersList.size(); i++)
+				questionsList.add(new LinkedList<>());
+			
+			List<TrailQuestion> quizz = new ArrayList<>();
+		
+			QueryResult query = queries.queryTrailQuizz(queryData ,  trailName);
+			
+			
+			Iterator<TrailQuestion> it = query.resultList.iterator();
+			
+			TrailQuestion next;
+			
+			while(it.hasNext()) {
+				next = it.next();
+				questionsList.get(markersList.indexOf(next.markerName)).add(next);
+			}
+			
+			Random generator = new Random();
+			
+			//adds 1 question from each marker to the quizz list
+			for(List<TrailQuestion> auxList : questionsList) {
+				if(!auxList.isEmpty())
+					quizz.add(auxList.get(generator.nextInt(auxList.size())));
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+			
+				
+		
+		return Response.ok(g.toJson(quizz)).build();
+	}
+	
+	
+	
+	
+	private boolean containsMarkerName(List<Marker> markers, String markerName) {
+		for(Marker aux : markers)
+			if(aux.stopover == true)
+				if(aux.name.equals(markerName))
+					return true;
+		return false;
+	}
+	
+	private List<Marker> getMarkersList(String trailName) throws JsonMappingException, JsonProcessingException{
+		
+		 BlobId blobId = BlobId.of("trailobyte-275015.appspot.com", "trails/"+ trailName +"/markers.json");	
+		 Blob blob = storage.get(blobId);
+					
+		 byte[] content = blob.getContent();
+		 String data = new String(content);
+		
+		 ObjectMapper mapper = new ObjectMapper();
+		 return mapper.readValue(data, new TypeReference<List<Marker>>(){});
+	}
+	
+	private List<String> getMarkersNamesList(String trailName) throws JsonMappingException, JsonProcessingException{
+		
+		List<Marker> markersList = getMarkersList(trailName);
+		
+		List<String> list = new ArrayList<>();
+		
+		for(Marker aux : markersList)
+			if(aux.stopover)
+				list.add(aux.name);
+		
+		return list;
+		
+	}
 }

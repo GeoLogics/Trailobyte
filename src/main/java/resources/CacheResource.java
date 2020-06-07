@@ -63,6 +63,19 @@ public class CacheResource {
 		return false;
     }
 	
+	public void dadsdd() {
+		
+		KeyFactory roleKeyFactory = datastore.newKeyFactory().setKind("Role");
+	
+		Key roleKey = roleKeyFactory.newKey("rolesTable");
+		
+		Entity table = datastore.get(roleKey);
+		
+	
+		
+		
+	}
+	
 	
 	
 	
