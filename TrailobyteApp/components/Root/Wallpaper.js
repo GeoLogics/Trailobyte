@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Dimensions, StyleSheet, ImageBackground} from 'react-native';
 
-import wallpaperImg from '../../images/wallpaper.png';
+import wallpaperImg from '../../images/wallpaper.jpg';
 
 export default class Wallpaper extends React.Component {
     render() {

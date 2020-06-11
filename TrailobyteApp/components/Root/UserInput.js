@@ -45,10 +45,11 @@ const styles = StyleSheet.create({
         paddingLeft: 45,
         borderRadius: 20,
         color: '#ffffff',
+        justifyContent: 'flex-end',
     },
     inputWrapper: {
-        flex: 1,
-        marginTop: 20,
+        flex: 0,
+        marginTop: 10,
     },
     inlineImg: {
         position: 'absolute',

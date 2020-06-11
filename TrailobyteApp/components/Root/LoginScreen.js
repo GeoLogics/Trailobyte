@@ -1,12 +1,13 @@
-import React from "react";
+import React from 'react';
 import PropTypes from 'prop-types';
+import { StyleSheet, View, Text } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import Logo from './Logo';
-import UserForm from './UserForm';
+import LoginForm from './LoginForm';
 import Wallpaper from './Wallpaper';
 import LoginButton from './LoginButton';
-import SignupSection from './SignupSection';
 
 import {targetUri as appEngineUri} from '../../app.json';
 
@@ -20,15 +21,20 @@ export default class LoginScreen extends React.Component {
     
         this.doLogin = this.doLogin.bind(this);
         this.isLoggedIn = this.isLoggedIn.bind(this);
+        this._onPress = this._onPress.bind(this);
+    }
+    
+    _onPress() {
+        Actions.registerScreen();
     }
     
     doLogin() {
-        if (this.refUserForm.state.username == '') {
-            alert('Error: Username inválido!');
-        } else if (this.refUserForm.state.password == '') {
-            alert('Error: Password inválida!');
+        if (this.refLoginForm.state.username == '') {
+            alert('Username inválido!');
+        } else if (this.refLoginForm.state.password == '') {
+            alert('Password inválida!');
         } else {
-            this.login(this.refUserForm.state.username, this.refUserForm.state.password);
+            this.login(this.refLoginForm.state.username, this.refLoginForm.state.password);
         }
     }
     
@@ -92,12 +98,35 @@ export default class LoginScreen extends React.Component {
         return (
             <Wallpaper>
                 <Logo />
-                <UserForm ref = {refUserForm => {this.refUserForm = refUserForm;}} />
+                <LoginForm ref = {refLoginForm => {this.refLoginForm = refLoginForm}} />
                 <LoginButton
                     doLogin = {this.doLogin}
                     isLoggedIn = {this.isLoggedIn} />
-                <SignupSection />
+                <View style={styles.container}>
+                    <Text
+                        style={styles.text}
+                        onPress={this._onPress}>
+                        Registar
+                    </Text>
+                    <Text
+                        style={styles.text}>
+                        Recuperar password
+                    </Text>
+                </View>
             </Wallpaper>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        top: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    text: {
+        color: 'white',
+        backgroundColor: 'transparent',
+    },
+});

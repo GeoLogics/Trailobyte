@@ -9,7 +9,7 @@ const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
 const MARGIN = 40;
 
-export default class LoginButton extends React.Component {
+export default class RegisterButton extends React.Component {
     constructor() {
         super();
         
@@ -26,7 +26,7 @@ export default class LoginButton extends React.Component {
         if (this.state.isLoading) return;
 
         this.setState({isLoading: true});
-        this.props.doLogin();
+        this.props.doRegister();
         
         Animated.timing(this.buttonAnimated, {
             toValue: 1,
@@ -40,8 +40,8 @@ export default class LoginButton extends React.Component {
         }, 2500);
 
         setTimeout(() => {
-            if (this.props.isLoggedIn()) {
-                Actions.userScreen();
+            if (this.props.isRegistered()) {
+                Actions.loginScreen();
             }
             this.setState({isLoading: false});
             this.buttonAnimated.setValue(0);
@@ -78,7 +78,7 @@ export default class LoginButton extends React.Component {
                     {this.state.isLoading ? (
                         <Image source={spinner} style={styles.image} />
                         ) : (
-                        <Text style={styles.text}>LOGIN</Text>
+                        <Text style={styles.text}>REGISTAR</Text>
                     )}
                 </TouchableOpacity>
                 <Animated.View style={[styles.circle, {transform: [{scale: changeScale}]}]}/>
@@ -91,6 +91,7 @@ export default class LoginButton extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        top: 20,
         alignItems: 'center',
         justifyContent: 'flex-end',
     },
