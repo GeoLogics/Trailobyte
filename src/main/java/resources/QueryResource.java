@@ -60,7 +60,7 @@ public class QueryResource {
 	@Path("/trail/byUser")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response queryByUsername(QueryData queryData) {
+	public Response queryTrailByUsername(QueryData queryData) {
 		
 		EntityQuery.Builder queryBuilder = Query.newEntityQueryBuilder()
 				.setKind("Trail")
@@ -69,14 +69,14 @@ public class QueryResource {
 		if(queryData.cursor != null)
 			queryBuilder.setStartCursor(Cursor.fromUrlSafe(queryData.cursor));
 		
-		return Response.ok(g.toJson(RunTrailQuery2(queryBuilder, queryData.pageSize))).build();	 	
+		return Response.ok(g.toJson(RunTrailQuery(queryBuilder, queryData.pageSize, null))).build();	 	
 	}
 
 	@POST
-	@Path("/trail/byRating2")
+	@Path("/trail/byRating")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response queryRating2(QueryData queryData) {
+	public Response queryTrailByRating(QueryData queryData) {
 		
 		EntityQuery.Builder queryBuilder = Query.newEntityQueryBuilder()
 		        .setKind("Trail")
@@ -87,20 +87,23 @@ public class QueryResource {
 		if(queryData.cursor != null)
 			queryBuilder.setStartCursor(Cursor.fromUrlSafe(queryData.cursor));
 		
-		return Response.ok(RunTrailQuery2(queryBuilder, queryData.pageSize)).build();
+		String key = "trailsRating"+queryData.pageSize;
+		
+		return Response.ok(g.toJson(RunTrailQuery(queryBuilder, queryData.pageSize, key))).build();
 	}
 	
 	
-	private String RunTrailQuery2(EntityQuery.Builder queryBuilder, int pageSize){
+	private QueryResult RunTrailQuery(EntityQuery.Builder queryBuilder, int pageSize, String key){
 		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
-		List<String> trails = new ArrayList<String>();
 		
-		String key = "trailsRating"+pageSize;
-		byte[] value = (byte[]) syncCache.get(key);
-		if(value != null) 
-			return new String(value);
+		List<TrailInfo> trails = new ArrayList<>();
 		
+		if(key!= null) {
+			String value = (String) syncCache.get(key);
+			if(value != null) 
+				return g.fromJson(value, QueryResult.class);
+		}
 		
 		QueryResults<Entity> trailsQ = datastore.run(queryBuilder.build());
 		
@@ -116,15 +119,17 @@ public class QueryResource {
 									trailEntity.getBoolean("verified")
 									);
 			
-		      trails.add(g.toJson(trail));
+		      trails.add(trail);
 		}
 	
 		String nextPageCursor = trailsQ.getCursorAfter().toUrlSafe();
-		trails.add(nextPageCursor);
+				
+		QueryResult result = new QueryResult(trails, nextPageCursor);
 		
-		syncCache.put(key, g.toJson(trails).getBytes());
+		if(key != null)
+			syncCache.put(key, g.toJson(result));
 		
-		return g.toJson(trails);
+		return result;
 	}
 	
 	
@@ -149,6 +154,24 @@ public class QueryResource {
 		
 		return RunQuestionQuery(queryBuilder, queryData.pageSize);
 	}
+	
+	//returns a list with all the questions from the trail's markers for the verificationLevel given and above
+	public QueryResult queryTrailUnverifiedQuestions(QueryData queryData,  String trailName) {
+		
+		EntityQuery.Builder queryBuilder = Query.newEntityQueryBuilder()
+			.setKind("TrailQuestion")
+		    .setFilter(PropertyFilter.hasAncestor(
+		        datastore.newKeyFactory().setKind("Trail").newKey(trailName)))
+		    .setFilter(PropertyFilter.eq("verificationLevel", (int) queryData.param))
+		    //.setOrderBy(OrderBy.asc("markerName"));
+		    .setLimit(queryData.pageSize);
+		
+		if(queryData.cursor != null)
+			queryBuilder.setStartCursor(Cursor.fromUrlSafe(queryData.cursor));
+		
+		return RunQuestionQuery(queryBuilder, queryData.pageSize);
+	}
+		
 	
 	
 	

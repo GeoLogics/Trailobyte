@@ -5,14 +5,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
@@ -22,6 +27,7 @@ import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
+import DTOs.QueryData;
 import util.Questions.QuestionListAnswerTF;
 import util.Questions.QuestionListOptionsQO;
 import util.Questions.QuestionListOrderQO;
@@ -51,6 +57,29 @@ public class QuestionResource {
 	public QuestionResource() {
 		
 	}
+	
+	@GET
+	@Path("/getLastID")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLastQuestionID(@Context HttpServletRequest req, @Context HttpServletResponse res,  @QueryParam("type")String questionType) {
+		
+		try {
+			Key key = questionsLastIDKeyFactory.newKey(questionType);
+			Entity lastIDEntity = datastore.get(key);
+			int id = (int) lastIDEntity.getLong("LastID");
+			
+			if(lastIDEntity != null)
+				return Response.ok(g.toJson(id)).build();
+			
+			return Response.status(Status.BAD_REQUEST).entity("No entity found for type given").build();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			throw(e);
+		}
+	
+	}
+	
 	
 	/*@GET
 	@Path("/getRandom")

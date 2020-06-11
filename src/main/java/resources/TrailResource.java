@@ -432,7 +432,8 @@ public class TrailResource {
 			case "E2" : verificationLevel = 1; break;
 			case "E3" : verificationLevel = 1; break;
 			case "E4" :	verificationLevel = 1; break;
-			case "BO" : verificationLevel = 2; break;
+			case "BO" : verificationLevel = 1; break;
+			case "BOQ": verificationLevel = 2; break;
 			default	  : verificationLevel = 0; break;
 		}
 		
@@ -507,31 +508,9 @@ public class TrailResource {
 	}
 	
 	
-	private TrailQuestion getTrailQuestion(String trailName, String key) {
-		
-		KeyFactory questionKeyFactory = datastore.newKeyFactory().addAncestors(PathElement.of("Trail", trailName)).setKind("TrailQuestion");
-		
-		Key questionKey = questionKeyFactory.newKey(key); 
-		
-		Entity questEnt = datastore.get(questionKey);
-		
-		return new TrailQuestion(
-				questEnt.getString("questionKey"), 
-				questEnt.getString("author"),
-				questEnt.getString("trailName"),
-				questEnt.getString("markerName"),
-				(int) questEnt.getDouble("verificationLevel"),
-				questEnt.getString("question"),
-				questEnt.getString("optionA"),
-				questEnt.getString("optionB"),
-				questEnt.getString("optionC"),
-				questEnt.getString("optionD"),
-				questEnt.getString("answer")
-				);
-	}
 	
 	
-	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
+	//ROLES:E3, E4, BO, BOQ, ADMIN
 	//OP_CODE: T6
 	@POST
 	@Path("/verifytrailquestion/{trailName}")
@@ -560,15 +539,17 @@ public class TrailResource {
 		
 		 
 		 //ver melhor como é que isto fica
-		switch(userEntity.getString("user_role")) {
-			case "E2" : verificationLevel = 1; break;
+		 switch(userEntity.getString("user_role")) {
+		
 			case "E3" : verificationLevel = 1; break;
 			case "E4" :	verificationLevel = 1; break;
-			case "BO" : verificationLevel = 2; break;
+			case "BO" : verificationLevel = 1; break;
+			case "BOQ" : verificationLevel = 2; break;
+			case "ADMIN" : verificationLevel = 1; break;
 			default	  : verificationLevel = 0; break;
-		}
+		 }
 		
-		if((int) questionEntity.getDouble("verificationLevel") >= verificationLevel)
+		if((int) questionEntity.getLong("verificationLevel") >= verificationLevel)
 			return Response.status(Status.BAD_REQUEST).entity("User does not have permissions to change verification level").build();
 		Transaction txn = null;
         try {
@@ -591,6 +572,7 @@ public class TrailResource {
 					.build();
     		 
 	         txn.put(newQuestionEntity); 
+	         txn.commit();
     		 return Response.ok("{}").build();
     		 
           }catch(Exception e) {
@@ -604,16 +586,35 @@ public class TrailResource {
 	      return null;	
 	}
 	
+	//ROLES: E3, E4, BO, BOQ, ADMIN
+	//OP_CODE: T7
+	@POST
+	@Path("/getUnverifiedQuestions/{trailName}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUnverifiedQuestions(@Context HttpServletRequest req, @Context HttpServletResponse res,  QueryData queryData, @PathParam("trailName")String trailName) throws FileUploadException, IOException  {
+		
+		if(trailName == null) 
+			return Response.status(Status.BAD_REQUEST).entity("null trailName").build();
+	
+		try {
+			return Response.ok(g.toJson(queries.queryTrailUnverifiedQuestions(queryData, trailName))).build();		
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			throw(e);
+		}
+	}
 	
 	//ROLES: E1, E2, E3, E4, BO, BOT, BOQ, FOW, FOA, FO, ADMIN
-	//OP_CODE: T7
+	//OP_CODE: T8
 	@POST
 	@Path("/getTrailQuizz/{trailName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTrailQuizz(@Context HttpServletRequest req, @Context HttpServletResponse res,  QueryData queryData, @PathParam("trailName")String trailName) throws FileUploadException, IOException  {
-		//WARNING: this beautiful piece of code is the most eficient thing ever made. 
-		//you are strongly advised not to read it. procead at your own discretion
+		//WARNING: this beautiful piece of code is the most efficient thing ever made. 
+		//you are strongly advised not to read it. proceed at your own discretion
 		
 		if(trailName == null) 
 			return Response.status(Status.BAD_REQUEST).entity("null trailName").build();
@@ -629,7 +630,7 @@ public class TrailResource {
 			
 			List<TrailQuestion> quizz = new ArrayList<>();
 		
-			QueryResult query = queries.queryTrailQuizz(queryData ,  trailName);
+			QueryResult query = queries.queryTrailQuizz(queryData ,trailName);
 			
 			
 			Iterator<TrailQuestion> it = query.resultList.iterator();
@@ -644,21 +645,41 @@ public class TrailResource {
 			Random generator = new Random();
 			
 			//adds 1 question from each marker to the quizz list
-			for(List<TrailQuestion> auxList : questionsList) {
+			for(List<TrailQuestion> auxList : questionsList) 
 				if(!auxList.isEmpty())
 					quizz.add(auxList.get(generator.nextInt(auxList.size())));
-			}
+			return Response.ok(g.toJson(quizz)).build();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
+			throw(e);
 		}
-			
-				
 		
-		return Response.ok(g.toJson(quizz)).build();
 	}
 	
-	
+
+	private TrailQuestion getTrailQuestion(String trailName, String key) {
+		
+		KeyFactory questionKeyFactory = datastore.newKeyFactory().addAncestors(PathElement.of("Trail", trailName)).setKind("TrailQuestion");
+		
+		Key questionKey = questionKeyFactory.newKey(key); 
+		
+		Entity questEnt = datastore.get(questionKey);
+		
+		return new TrailQuestion(
+				questEnt.getString("questionKey"), 
+				questEnt.getString("author"),
+				questEnt.getString("trailName"),
+				questEnt.getString("markerName"),
+				(int) questEnt.getDouble("verificationLevel"),
+				questEnt.getString("question"),
+				questEnt.getString("optionA"),
+				questEnt.getString("optionB"),
+				questEnt.getString("optionC"),
+				questEnt.getString("optionD"),
+				questEnt.getString("answer")
+				);
+	}
 	
 	
 	private boolean containsMarkerName(List<Marker> markers, String markerName) {
@@ -691,7 +712,6 @@ public class TrailResource {
 			if(aux.stopover)
 				list.add(aux.name);
 		
-		return list;
-		
+		return list;	
 	}
 }

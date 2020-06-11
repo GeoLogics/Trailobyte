@@ -52,17 +52,17 @@ public class RoleResource {
 		Key rolesTableKey = roleKeyFactory.newKey("roletable");
 		
 		Entity rolesTableEntity = Entity.newBuilder(rolesTableKey)
-				.set("E1", ListValue.of("T1","T3","T4"))
-				.set("E2", ListValue.of("T1","T2","T3","T4"))
-				.set("E3", ListValue.of("T1","T3","T4"))
-				.set("E4", ListValue.of("T1","T2","T3","T4"))
-				.set("BO", ListValue.of("T1","T2","T3","T4","PQMC1","PQO1","PQTF1"))
-				.set("BOT", ListValue.of("T1","T2","T3","T4"))
-				.set("BOQ", ListValue.of("T1","T3","T4","PQMC1","PQO1","PQTF1"))
-				.set("FOW", ListValue.of("T1","T3","T4"))
-				.set("FOA", ListValue.of("T1","T3","T4"))
-				.set("FO", ListValue.of("T1","T3","T4"))
-				.set("ADMIN", ListValue.of("T1","T2","T3","T4","PQMC1","PQO1","PQTF1","X1"))
+				.set("E1", ListValue.of("T1","T3","T4","T5","T8"))
+				.set("E2", ListValue.of("T1","T2","T3","T4","T5","T8"))
+				.set("E3", ListValue.of("T1","T3","T4","T5","T6","T7","T8"))
+				.set("E4", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8"))
+				.set("BO", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1"))
+				.set("BOT", ListValue.of("T1","T2","T3","T4","T5","T8"))
+				.set("BOQ", ListValue.of("T1","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1"))
+				.set("FOW", ListValue.of("T1","T3","T4","T5","T8"))
+				.set("FOA", ListValue.of("T1","T3","T4","T5","T8"))
+				.set("FO", ListValue.of("T1","T3","T4","T5","T8"))
+				.set("ADMIN", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1","X1"))
 				.build();
 		
 		 Transaction txn = null;
