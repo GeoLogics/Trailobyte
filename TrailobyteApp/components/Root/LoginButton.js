@@ -10,8 +10,8 @@ const DEVICE_HEIGHT = Dimensions.get('window').height;
 const MARGIN = 40;
 
 export default class LoginButton extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         
         this.state = {
             isLoading: false,
@@ -20,6 +20,7 @@ export default class LoginButton extends React.Component {
         this.buttonAnimated = new Animated.Value(0);
         this.growAnimated = new Animated.Value(0);
         this._onPress = this._onPress.bind(this);
+        this._onGrow = this._onGrow.bind(this);
     }
 
     _onPress() {
@@ -41,7 +42,7 @@ export default class LoginButton extends React.Component {
 
         setTimeout(() => {
             if (this.props.isLoggedIn()) {
-                Actions.userScreen();
+                Actions.userTrailScreen();
             }
             this.setState({isLoading: false});
             this.buttonAnimated.setValue(0);
@@ -67,25 +68,24 @@ export default class LoginButton extends React.Component {
             inputRange: [0, 1],
             outputRange: [1, MARGIN],
         });
-
-    return (
-        <View style={styles.container}>
-            <Animated.View style={{width: changeWidth}}>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={this._onPress}
-                    activeOpacity={1}>
-                    {this.state.isLoading ? (
-                        <Image source={spinner} style={styles.image} />
-                        ) : (
-                        <Text style={styles.text}>LOGIN</Text>
-                    )}
-                </TouchableOpacity>
-                <Animated.View style={[styles.circle, {transform: [{scale: changeScale}]}]}/>
-            </Animated.View>
-        </View>
-    );
-  }
+        return (
+            <View style={styles.container}>
+                <Animated.View style={{width: changeWidth}}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={this._onPress}
+                        activeOpacity={1}>
+                        {this.state.isLoading ? (
+                            <Image source={spinner} style={styles.image} />
+                            ) : (
+                            <Text style={styles.text}>LOGIN</Text>
+                        )}
+                    </TouchableOpacity>
+                    <Animated.View style={[styles.circle, {transform: [{scale: changeScale}]}]}/>
+                </Animated.View>
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -107,11 +107,11 @@ const styles = StyleSheet.create({
         width: MARGIN,
         marginTop: -MARGIN,
         borderWidth: 1,
-        borderColor: '#555555',
+        borderColor: '#3792CB',
         borderRadius: 100,
         alignSelf: 'center',
         zIndex: 99,
-        backgroundColor: '#555555',
+        backgroundColor: '#3792CB',
     },
     text: {
         color: 'white',

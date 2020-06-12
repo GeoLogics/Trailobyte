@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, TouchableOpacity, Text, Animated, Easing, Image, Alert, View, Dimensions } from 'react-native';
-import {Actions, ActionConst} from 'react-native-router-flux';
+import { Actions, ActionConst } from 'react-native-router-flux';
 
 import spinner from '../../images/loading.gif';
 
@@ -10,8 +10,8 @@ const DEVICE_HEIGHT = Dimensions.get('window').height;
 const MARGIN = 40;
 
 export default class RegisterButton extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         
         this.state = {
             isLoading: false,
@@ -20,6 +20,7 @@ export default class RegisterButton extends React.Component {
         this.buttonAnimated = new Animated.Value(0);
         this.growAnimated = new Animated.Value(0);
         this._onPress = this._onPress.bind(this);
+        this._onGrow = this._onGrow.bind(this);
     }
 
     _onPress() {
@@ -68,24 +69,24 @@ export default class RegisterButton extends React.Component {
             outputRange: [1, MARGIN],
         });
 
-    return (
-        <View style={styles.container}>
-            <Animated.View style={{width: changeWidth}}>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={this._onPress}
-                    activeOpacity={1}>
-                    {this.state.isLoading ? (
-                        <Image source={spinner} style={styles.image} />
-                        ) : (
-                        <Text style={styles.text}>REGISTAR</Text>
-                    )}
-                </TouchableOpacity>
-                <Animated.View style={[styles.circle, {transform: [{scale: changeScale}]}]}/>
-            </Animated.View>
-        </View>
-    );
-  }
+        return (
+            <View style={styles.container}>
+                <Animated.View style={{width: changeWidth}}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={this._onPress}
+                        activeOpacity={1}>
+                        {this.state.isLoading ? (
+                            <Image source={spinner} style={styles.image} />
+                            ) : (
+                            <Text style={styles.text}>REGISTAR</Text>
+                        )}
+                    </TouchableOpacity>
+                    <Animated.View style={[styles.circle, {transform: [{scale: changeScale}]}]}/>
+                </Animated.View>
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -108,11 +109,11 @@ const styles = StyleSheet.create({
         width: MARGIN,
         marginTop: -MARGIN,
         borderWidth: 1,
-        borderColor: '#555555',
+        borderColor: '#3792CB',
         borderRadius: 100,
         alignSelf: 'center',
         zIndex: 99,
-        backgroundColor: '#555555',
+        backgroundColor: '#3792CB',
     },
     text: {
         color: 'white',

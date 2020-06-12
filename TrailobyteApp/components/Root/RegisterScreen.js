@@ -19,9 +19,10 @@ export default class RegisterScreen extends React.Component {
             userIsRegistered: false,
         };
         
+        this._onPress = this._onPress.bind(this);
         this.doRegister = this.doRegister.bind(this);
         this.isRegistered = this.isRegistered.bind(this);
-        this._onPress = this._onPress.bind(this);
+        this.register = this.register.bind(this);
     }
     
     _onPress() {

@@ -19,9 +19,10 @@ export default class LoginScreen extends React.Component {
             userIsLoggedIn: false,
         };
     
+        this._onPress = this._onPress.bind(this);
         this.doLogin = this.doLogin.bind(this);
         this.isLoggedIn = this.isLoggedIn.bind(this);
-        this._onPress = this._onPress.bind(this);
+        this.login = this.login.bind(this);
     }
     
     _onPress() {

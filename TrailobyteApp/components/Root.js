@@ -4,7 +4,7 @@ import { Router, Scene } from 'react-native-router-flux';
 import SplashScreen from './Root/SplashScreen';
 import LoginScreen from './Root/LoginScreen';
 import RegisterScreen from './Root/RegisterScreen';
-import UserScreen from './Root/UserScreen';
+import UserTrailScreen from './Root/UserTrailScreen';
 
 export default class Main extends React.Component {
     render() {
@@ -27,8 +27,8 @@ export default class Main extends React.Component {
                         animation='fade'
                         hideNavBar={true}
                     />
-                    <Scene key="userScreen"
-                        component={UserScreen}
+                    <Scene key="userTrailScreen"
+                        component={UserTrailScreen}
                         animation='fade'
                         hideNavBar={true}
                     />
