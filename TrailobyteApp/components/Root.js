@@ -5,6 +5,9 @@ import SplashScreen from './Root/SplashScreen';
 import LoginScreen from './Root/LoginScreen';
 import RegisterScreen from './Root/RegisterScreen';
 import UserTrailScreen from './Root/UserTrailScreen';
+import UserQuizzScreen from './Root/UserQuizzScreen';
+import UserQuizzQuestionScreen from './Root/UserQuizzQuestionScreen';
+import UserAreaScreen from './Root/UserAreaScreen';
 
 export default class Main extends React.Component {
     render() {
@@ -29,6 +32,21 @@ export default class Main extends React.Component {
                     />
                     <Scene key="userTrailScreen"
                         component={UserTrailScreen}
+                        animation='fade'
+                        hideNavBar={true}
+                    />
+                    <Scene key="userQuizzScreen"
+                        component={UserQuizzScreen}
+                        animation='fade'
+                        hideNavBar={true}
+                    />
+                    <Scene key="userQuizzQuestionScreen"
+                        component={UserQuizzQuestionScreen}
+                        animation='fade'
+                        hideNavBar={true}
+                    />
+                    <Scene key="userAreaScreen"
+                        component={UserAreaScreen}
                         animation='fade'
                         hideNavBar={true}
                     />

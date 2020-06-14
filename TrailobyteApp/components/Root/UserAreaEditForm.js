@@ -4,7 +4,6 @@ import { StyleSheet, KeyboardAvoidingView, View, ActivityIndicator, TouchableOpa
 
 import UserInput from './UserInput';
 
-import usernameImg from '../../images/username.png';
 import passwordImg from '../../images/password.png';
 import emailImg from '../../images/email.png';
 import homeImg from '../../images/home.png';
@@ -12,10 +11,7 @@ import mobileImg from '../../images/mobile.png';
 import phoneImg from '../../images/phone.png';
 import eyeImg from '../../images/eye_black.png';
 
-const DEVICE_WIDTH = Dimensions.get('window').width;
-const DEVICE_HEIGHT = Dimensions.get('window').height;
-
-export default class RegisterForm extends React.Component {
+export default class UserAreaEditForm extends React.Component {
     constructor(props) {
         super(props);
         
@@ -44,20 +40,36 @@ export default class RegisterForm extends React.Component {
         return (
             <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} style={styles.container}>
                 <UserInput
-                    source={usernameImg}
-                    placeholder="Username"
-                    autoCapitalize={'none'}
-                    returnKeyType={'done'}
-                    autoCorrect={false}
-                    onChangeText={(text) => this.setState({username: text})}
-                />
-                <UserInput
                     source={emailImg}
-                    placeholder="Email"
+                    placeholder={this.props.email}
                     autoCapitalize={'none'}
                     returnKeyType={'done'}
                     autoCorrect={false}
                     onChangeText={(text) => this.setState({email: text})}
+                />
+                <UserInput
+                    source={phoneImg}
+                    placeholder={this.props.telephone}
+                    autoCapitalize={'none'}
+                    returnKeyType={'done'}
+                    autoCorrect={false}
+                    onChangeText={(text) => this.setState({telephone: text})}
+                />
+                <UserInput
+                    source={mobileImg}
+                    placeholder={this.props.mobilePhone}
+                    autoCapitalize={'none'}
+                    returnKeyType={'done'}
+                    autoCorrect={false}
+                    onChangeText={(text) => this.setState({mobilePhone: text})}
+                />
+                <UserInput
+                    source={homeImg}
+                    placeholder={this.props.address}
+                    autoCapitalize={'none'}
+                    returnKeyType={'done'}
+                    autoCorrect={false}
+                    onChangeText={(text) => this.setState({address: text})}
                 />
                 <UserInput
                     source={passwordImg}
@@ -77,30 +89,6 @@ export default class RegisterForm extends React.Component {
                     autoCorrect={false}
                     onChangeText={(text) => this.setState({confirmation: text})}
                 />
-                <UserInput
-                    source={phoneImg}
-                    placeholder="Telefone"
-                    autoCapitalize={'none'}
-                    returnKeyType={'done'}
-                    autoCorrect={false}
-                    onChangeText={(text) => this.setState({telephone: text})}
-                />
-                <UserInput
-                    source={mobileImg}
-                    placeholder="Telemóvel"
-                    autoCapitalize={'none'}
-                    returnKeyType={'done'}
-                    autoCorrect={false}
-                    onChangeText={(text) => this.setState({mobilePhone: text})}
-                />
-                <UserInput
-                    source={homeImg}
-                    placeholder="Endereço"
-                    autoCapitalize={'none'}
-                    returnKeyType={'done'}
-                    autoCorrect={false}
-                    onChangeText={(text) => this.setState({address: text})}
-                />
                 <TouchableOpacity
                     activeOpacity={0.7}
                     style={styles.btnEye}
@@ -112,16 +100,23 @@ export default class RegisterForm extends React.Component {
     }
 }
 
+UserAreaEditForm.propTypes = {
+    email: PropTypes.string,
+    telephone: PropTypes.string,
+    mobilePhone: PropTypes.string,
+    address: PropTypes.string,
+};
+
 const styles = StyleSheet.create({
     container: {
         flex: 0,
-        top: 50,
+        top: 100,
         alignItems: 'center',
         justifyContent: 'flex-end',
     },
     btnEye: {
         flex: 0,
-        top: -230,
+        top: -80,
         left: 150,
         
     },

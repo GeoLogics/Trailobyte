@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import { StyleSheet, View, Image, TouchableOpacity, Animated, Easing, Dimensions, PermissionsAndroid } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Animated, Easing, Dimensions, PermissionsAndroid } from 'react-native';
 import { Actions, ActionConst } from 'react-native-router-flux';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 
 import Wallpaper from './Wallpaper';
+import UserMenu from './UserMenu';
 
-import arrowImg from '../../images/left-arrow.png';
 import {targetUri as appEngineUri} from '../../app.json';
 
 const {width, height} = Dimensions.get('window')
@@ -18,7 +18,6 @@ const SCREEN_WIDTH = width
 const ASPECT_RATIO = width / height
 const LATITUDE_DELTA = 0.0922
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
-const ITEM_SIZE = 40;
 
 export default class UserTrailScreen extends React.Component {
     constructor(props) {
@@ -32,18 +31,18 @@ export default class UserTrailScreen extends React.Component {
                 longitudeDelta: 0,
             },
             markers: [],
-            cursor: null,
-            isLoading: false,
+            userTrails: [],
+            ratingTrails: [],
+            userCursor: null,
+            ratingCursor: null,
             username: '',
             verifier: ''
         };
         
-        this.growAnimated = new Animated.Value(0);
-        this._onPress = this._onPress.bind(this);
         this.requestLocationPermission = this.requestLocationPermission.bind(this);
-        this.logout = this.logout.bind(this);
         this.getTrail = this.getTrail.bind(this);
         this.queryTrailByRating = this.queryTrailByRating.bind(this);
+        this.queryTrailByUsername = this.queryTrailByUsername.bind(this);
         this.mapMarkers = this.mapMarkers.bind(this);
         
         if (Platform.OS === "android") {
@@ -78,25 +77,8 @@ export default class UserTrailScreen extends React.Component {
     }
     
     componentDidMount() {
+        this.queryTrailByUsername();
         this.queryTrailByRating();
-    }
-    
-    _onPress() {
-        if (this.state.isLoading) return;
-
-        this.setState({isLoading: true});
-        this.logout();
-
-        Animated.timing(this.growAnimated, {
-            toValue: 1,
-            duration: 300,
-            easing: Easing.linear,
-            useNativeDriver: false,
-        }).start();
-
-        setTimeout(() => {
-            Actions.pop();
-        }, 500);
     }
     
     async requestLocationPermission() {
@@ -120,53 +102,6 @@ export default class UserTrailScreen extends React.Component {
             console.warn(err);
         }
     };
-
-    async logout() {
-        try {
-            // Get items from AsyncStorage
-            const usernameValue = await AsyncStorage.getItem('username');
-            const verifierValue = await AsyncStorage.getItem('verifier');
-            
-            // Set current username
-            if (usernameValue !== null) {
-                console.log(usernameValue);
-                this.setState({username: usernameValue});
-            }
-            
-            // Set current verifier
-            if (verifierValue !== null) {
-                console.log(verifierValue);
-                this.setState({verifier: verifierValue});
-            }
-        } catch (error) {
-            // Failed to load data from AsyncStorage
-        }
-        
-        await fetch(appEngineUri + '/rest/logout/v1', {
-            method: 'DELETE',
-            headers: {
-                'username' : this.state.username,
-                'Authorization' : 'Bearer ' + this.state.verifier,
-            }
-        })
-        .then(function(response) {
-                console.log(response);
-                if (!response.ok) {
-                    throw new Error(response.status);
-                }
-            })
-        .then(async () => {
-            try {
-                // Remove items first if they exist
-                await AsyncStorage.removeItem('username');
-                await AsyncStorage.removeItem('verifier');
-            } catch (error) {
-                // Failed to save data in AsyncStorage
-            }
-        })
-        .catch((error) => { alert(error); })
-        .done();
-    }
     
     async queryTrailByRating() {
         try {
@@ -189,7 +124,7 @@ export default class UserTrailScreen extends React.Component {
             // Failed to load data from AsyncStorage
         }
         
-        await fetch(appEngineUri + '/rest/query/trail/byRating', {
+        await fetch(appEngineUri + '/rest/query/byRating', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -199,23 +134,73 @@ export default class UserTrailScreen extends React.Component {
             },
             body: JSON.stringify({
                 pageSize: 5,
-                cursor: this.state.cursor,
+                cursor: this.state.ratingCursor,
             })
         })
         .then(function(response) {
                 console.log(response);
                 if (response.ok) {
                     return response.json();
-                } else if (response.status == 404) {
-                    console.log("Trail doesn't exist.");
                 } else {
                     throw new Error(response.status);
                 }
             })
         .then(data => {
             console.log(data);
-            this.setState({cursor: data.cursor});
-            this.getTrail("SintraCascais");
+            this.setState({ratingCursor: data.cursor});
+            this.setState({ratingTrails: data.resultList});
+        })
+        .catch((error) => { alert(error); })
+        .done();
+    }
+    
+    async queryTrailByUsername() {
+        try {
+            // Get items from AsyncStorage
+            const usernameValue = await AsyncStorage.getItem('username');
+            const verifierValue = await AsyncStorage.getItem('verifier');
+            
+            // Set current username
+            if (usernameValue !== null) {
+                console.log(usernameValue);
+                this.setState({username: usernameValue});
+            }
+            
+            // Set current verifier
+            if (verifierValue !== null) {
+                console.log(verifierValue);
+                this.setState({verifier: verifierValue});
+            }
+        } catch (error) {
+            // Failed to load data from AsyncStorage
+        }
+        
+        await fetch(appEngineUri + '/rest/query/byUser', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'username' : this.state.username,
+                'Authorization' : 'Bearer ' + this.state.verifier,
+            },
+            body: JSON.stringify({
+                param: this.state.username,
+                pageSize: 5,
+                cursor: this.state.userCursor,
+            })
+        })
+        .then(function(response) {
+                console.log(response);
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error(response.status);
+                }
+            })
+        .then(data => {
+            console.log(data);
+            this.setState({userCursor: data.cursor});
+            this.setState({userTrails: data.resultList});
         })
         .catch((error) => { alert(error); })
         .done();
@@ -245,6 +230,8 @@ export default class UserTrailScreen extends React.Component {
         await fetch(appEngineUri + '/rest/trail/OPT3OP/' + trailName, {
             method: 'GET',
             headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
                 'username' : this.state.username,
                 'Authorization' : 'Bearer ' + this.state.verifier,
             }
@@ -254,7 +241,7 @@ export default class UserTrailScreen extends React.Component {
                 if (response.ok) {
                     return response.json();
                 } else if (response.status == 404) {
-                    console.log("Trail doesn't exist.");
+                    console.log("Percurso não encontrado!");
                 } else {
                     throw new Error(response.status);
                 }
@@ -268,30 +255,51 @@ export default class UserTrailScreen extends React.Component {
     }
     
     mapMarkers() {
-        return this.state.markers.map((marker) => <Marker
+        return this.state.markers.map((marker, index) => <Marker
+            key={index}
             coordinate={{ latitude: marker.coords.lat, longitude: marker.coords.lng }}
             title={marker.name}
             description={marker.content}
             >
-            </Marker >)
+            </Marker >);
+    }
+    
+    mapUserTrails() {
+        if (this.state.userTrails && this.state.userTrails.length) {
+            return this.state.userTrails.map((trail, index) => <TouchableOpacity
+                key={index}
+                style={styles.button}
+                onPress={() => this.getTrail(trail.name)}>
+                    <Text style={styles.text}>{trail.name}</Text>
+                </TouchableOpacity >);
+        }
+    }
+    
+    mapRatingTrails() {
+        if (this.state.ratingTrails && this.state.ratingTrails.length) {
+            return this.state.ratingTrails.map((trail, index) => <TouchableOpacity
+                key={index}
+                style={styles.button}
+                onPress={() => this.getTrail(trail.name)}>
+                    <Text style={styles.text}>{trail.name}</Text>
+                </TouchableOpacity >);
+        }
     }
     
     render() {
-        const changeScale = this.growAnimated.interpolate({
-            inputRange: [0, 1],
-            outputRange: [1, ITEM_SIZE],
-        });
-        
         return (
             <Wallpaper>
                 <View style={styles.container}>
                     <MapView
                         style={styles.map}
                         region={this.state.region}
-                        onRegionChangeComplete={ region => {
+                        onRegionChangeComplete={region => {
                             this.setState({region});
                         }}
-                        showsUserLocation={ true } >
+                        showsUserLocation={true}
+                        showsCompass={true}
+                        zoomEnabled={true}
+                        rotateEnabled={true}>
                             {this.mapMarkers()}
                             <Polyline
                                 coordinates = {this.state.markers.map((marker) => ({
@@ -302,15 +310,25 @@ export default class UserTrailScreen extends React.Component {
                                 strokeColor = '#19B5FE'
                                 strokeWidth = {5}
                             />
-                    </MapView>
-                    <TouchableOpacity
-                        onPress={this._onPress}
-                        style={styles.button}
-                        activeOpacity={1}>
-                            <Image style={styles.image} source={arrowImg} />
-                    </TouchableOpacity>
-                    <Animated.View style={[styles.circle, {transform: [{scale: changeScale}]}]} />
+                    </MapView>                    
+                    <View style={styles.trailList}>
+                        <View style={styles.userTrailList}>
+                            <Text
+                                style={styles.title}>
+                                    Os meus percursos
+                            </Text>
+                            {this.mapUserTrails()}
+                        </View>
+                        <View style={styles.userRatingList}>
+                            <Text
+                                style={styles.title}>
+                                    Top 5
+                            </Text>
+                            {this.mapRatingTrails()}
+                        </View>
+                    </View>
                 </View>
+                <UserMenu />
             </Wallpaper>
         );
     }
@@ -325,29 +343,49 @@ const styles = StyleSheet.create({
     },
     map: {
         position: 'absolute',
+        height: SCREEN_HEIGHT - 400,
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
     },
+    trailList: {
+        flex: 1,
+        top: SCREEN_HEIGHT - 400,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+    },
+    userTrailList: {
+        marginTop: 40,
+        padding: 10,
+        borderWidth: 1,
+        marginRight: 10,
+        borderRadius: 20,
+        backgroundColor: 'rgba(55, 146, 203, 0.5)',
+    },
+    userRatingList: {
+        marginTop: 40,
+        padding: 10,
+        borderWidth: 1,
+        marginRight: 0,
+        borderRadius: 20,
+        backgroundColor: 'rgba(55, 146, 203, 0.5)',
+    },
+    title: {
+        alignSelf:'center',
+        fontSize: 18,
+        fontWeight: '900',
+        color: 'white',
+        textDecorationLine: 'underline',
+    },
     button: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: ITEM_SIZE,
-        height: ITEM_SIZE,
-        borderRadius: 100,
-        zIndex: 99,
-        backgroundColor: '#3792CB',
+        color: 'white',
     },
-    circle: {
-        height: ITEM_SIZE,
-        width: ITEM_SIZE,
-        marginTop: -ITEM_SIZE,
-        borderRadius: 100,
-        backgroundColor: '#3792CB',
-    },
-    image: {
-        width: 24,
-        height: 24,
+    text: {
+        marginTop: 10,
+        fontSize: 14,
+        fontWeight: '600',
+        color: 'white',
     },
 });

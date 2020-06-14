@@ -59,8 +59,7 @@ export default class RegisterScreen extends React.Component {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Credentials' : 'true'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 username: username,
@@ -77,7 +76,7 @@ export default class RegisterScreen extends React.Component {
                 if (response.ok) {
                     return response.json();
                 } else if (response.status == 403) {
-                    throw new Error("Login inválido!");
+                    throw new Error("Registo inválido!");
                 } else {
                     throw new Error(response.status);
                 }
