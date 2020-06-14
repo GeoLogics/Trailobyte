@@ -87,7 +87,9 @@ public class QueryResource {
 		if(queryData.cursor != null)
 			queryBuilder.setStartCursor(Cursor.fromUrlSafe(queryData.cursor));
 		
-		String key = "trailsRating"+queryData.pageSize;
+		String key = null;
+		if(queryData.cursor == null)
+			key = "trailsRating"+queryData.pageSize;
 		
 		return Response.ok(g.toJson(RunTrailQuery(queryBuilder, queryData.pageSize, key))).build();
 	}
