@@ -28,6 +28,18 @@ public class RegisterData {
 		this.address = address;
 
 	}
+	
+	public RegisterData(String username, String email,String telephone, 
+			String mobilePhone, String address) {
+		
+		this.username = username;
+		this.email = email;
+		this.telephone = telephone;
+		this.mobilePhone = mobilePhone;
+		this.address = address;
+
+	}
+
 
 	private boolean validField(String value) {
 		return value != null && !value.equals("");

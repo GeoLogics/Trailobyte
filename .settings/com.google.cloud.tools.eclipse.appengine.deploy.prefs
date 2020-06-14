@@ -1,8 +1,8 @@
-account.email=casquilhogaming@hotmail.com
+account.email=antoniomiguelramalho@gmail.com
 eclipse.preferences.version=1
-include.optional.configuration.files=true
+include.optional.configuration.files=false
 project.bucket=
 project.id=trailobyte-275015
 project.previousVersion.stop=true
 project.promote=true
-project.version=alpha
+project.version=beta

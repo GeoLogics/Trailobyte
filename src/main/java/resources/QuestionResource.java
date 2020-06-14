@@ -5,14 +5,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
@@ -26,7 +31,7 @@ import util.Questions.QuestionListAnswerTF;
 import util.Questions.QuestionListOptionsQO;
 import util.Questions.QuestionListOrderQO;
 import util.Questions.QuestionListQuestionsTF;
-import util.Questions.QuestionMultipleChoise;
+import util.Questions.QuestionMultipleChoice;
 import util.Questions.QuestionOrder;
 import util.Questions.QuestionTrueOrFalse;
 
@@ -50,6 +55,29 @@ public class QuestionResource {
 	
 	public QuestionResource() {
 		
+	}
+	
+	
+	@GET
+	@Path("/getLastID")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLastQuestionID(@Context HttpServletRequest req, @Context HttpServletResponse res,  @QueryParam("type")String questionType) {
+		
+		try {
+			Key key = questionsLastIDKeyFactory.newKey(questionType);
+			Entity lastIDEntity = datastore.get(key);
+			int id = (int) lastIDEntity.getLong("LastID");
+			
+			if(lastIDEntity != null)
+				return Response.ok(g.toJson(id)).build();
+			
+			return Response.status(Status.BAD_REQUEST).entity("No entity found for type given").build();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			throw(e);
+		}
+	
 	}
 	
 	/*@GET
@@ -157,11 +185,12 @@ public class QuestionResource {
 		return null;
 	}*/
 	
-	
+	//ROLES: BOQ, BO, ADMIN
+	//OP_CODE: PQMC1 
 	@POST
-	@Path("/postQMC")
+	@Path("/OPPQMC1OP")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postQuestionMultipleChoise(QuestionMultipleChoise question) {
+	public Response postQuestionMultipleChoise(QuestionMultipleChoice question) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
@@ -203,9 +232,10 @@ public class QuestionResource {
 		return null;
 	}
 	
-	
+	//ROLES: E1, E2, E3, E4 ?
+	//OP_CODE: GQMC1
 	@GET
-	@Path("/getQMC/{id}")
+	@Path("/OPGQMC1OP/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getQuestionMultipleChoise(@PathParam("id") int id) {
 		
@@ -223,7 +253,7 @@ public class QuestionResource {
 			String optionD = questionMCEntity.getString("optionD");
 			String correctOption = questionMCEntity.getString("correctOption");
 			
-			QuestionMultipleChoise question = new QuestionMultipleChoise(
+			QuestionMultipleChoice question = new QuestionMultipleChoice(
 					enunciated, questionS,
 					optionA, optionB,
 					optionC, optionD,
@@ -242,9 +272,10 @@ public class QuestionResource {
 	}
 	
 	
-	
+	//ROLES: BOQ, BO, ADMIN
+	//OP_CODE: PQO1
 	@POST
-	@Path("/postQO")
+	@Path("/OPPQO1OP")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postQuestionOrder(QuestionOrder question) {
 		
@@ -288,9 +319,10 @@ public class QuestionResource {
 		return null;
 	}
 	
-	
+	//ROLES: E1, E2, E3, E4 ?
+	//OP_CODE: GQO1
 	@GET
-	@Path("/getQO/{id}")
+	@Path("/OPGQO1OP/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getQuestionOrder(@PathParam("id") int id) {
 		
@@ -326,9 +358,10 @@ public class QuestionResource {
 		return null;
 	}
 	
-	
+	//ROLES: BOQ, BO, ADMIN
+	//OP_CODE: PQTF1
 	@POST
-	@Path("/postQTF")
+	@Path("/OPPQTF1OP")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postQuestionTrueOrFalse(QuestionTrueOrFalse question) {
 		
@@ -374,9 +407,10 @@ public class QuestionResource {
 	
 	
 	
-	
+	//ROLES: E1, E2, E3, E4 ?
+	//OP_CODE: GQTF1
 	@GET
-	@Path("/getQTF/{id}")
+	@Path("/OPGQTF1OP/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getQuestionTrueOrFalse(@PathParam("id") int id) {
 		

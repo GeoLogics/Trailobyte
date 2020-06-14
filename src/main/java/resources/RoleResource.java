@@ -47,22 +47,23 @@ public class RoleResource {
 		
 	}
 	
+	
 	public Response createRolesTable() {
 		
 		Key rolesTableKey = roleKeyFactory.newKey("roletable");
 		
 		Entity rolesTableEntity = Entity.newBuilder(rolesTableKey)
-				.set("E1", ListValue.of("T1","T3","T4"))
-				.set("E2", ListValue.of("T1","T2","T3","T4"))
-				.set("E3", ListValue.of("T1","T3","T4"))
-				.set("E4", ListValue.of("T1","T2","T3","T4"))
-				.set("BO", ListValue.of("T1","T2","T3","T4","PQMC1","PQO1","PQTF1"))
-				.set("BOT", ListValue.of("T1","T2","T3","T4"))
-				.set("BOQ", ListValue.of("T1","T3","T4","PQMC1","PQO1","PQTF1"))
-				.set("FOW", ListValue.of("T1","T3","T4"))
-				.set("FOA", ListValue.of("T1","T3","T4"))
-				.set("FO", ListValue.of("T1","T3","T4"))
-				.set("ADMIN", ListValue.of("T1","T2","T3","T4","PQMC1","PQO1","PQTF1","X1"))
+				.set("E1", ListValue.of("T1","T3","T4","T5","T8","GQMC1","GQO1","GQTF1"))
+				.set("E2", ListValue.of("T1","T2","T3","T4","T5","T8","GQMC1","GQO1","GQTF1"))
+				.set("E3", ListValue.of("T1","T3","T4","T5","T6","T7","T8","GQMC1","GQO1","GQTF1"))
+				.set("E4", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","GQMC1","GQO1","GQTF1"))
+				.set("BO", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1"))
+				.set("BOT", ListValue.of("T1","T2","T3","T4","T5","T8"))
+				.set("BOQ", ListValue.of("T1","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1"))
+				.set("FOW", ListValue.of("T1","T3","T4","T5","T8"))
+				.set("FOA", ListValue.of("T1","T3","T4","T5","T8"))
+				.set("FO", ListValue.of("T1","T3","T4","T5","T8"))
+				.set("ADMIN", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1","GQMC1","GQO1","GQTF1","X1"))
 				.build();
 		
 		 Transaction txn = null;
@@ -89,20 +90,13 @@ public class RoleResource {
 	//ROLES: ADMIN
 	//OP_CODE: X1
 	@PUT
-	@Path("/changerole")
+	@Path("/OPX1OP")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response changeUserRole(@Context HttpServletRequest req, UserRoleData data) {
 		String admin_authKey = req.getHeader("Authorization").split(" ")[1];
 		String admin_username = req.getHeader("username");
-		
-		Utils util = new Utils();
+	
 		Transaction txn = null;
-		
-		if(!util.Authentication(admin_authKey, admin_username)) 
-			return Response.status(Status.FORBIDDEN).entity("User: " + admin_username + " does not have a valid session key.").build();
-
-		if(!checkPermissions(admin_username, "X1"))
-			return Response.status(Status.FORBIDDEN).entity("User: " + admin_username + " does not have the necessary permissions for this operation.").build();
 		
 		if(data.role.equals("ADMIN"))
 			return Response.status(Status.FORBIDDEN).entity("Cannot change user roles to ADMIN").build();
@@ -141,9 +135,6 @@ public class RoleResource {
 				txn.rollback();
 		}
 	}
-	
-	
-	
 	
 	public boolean checkPermissions(String userName, String method) {
 		

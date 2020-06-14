@@ -26,7 +26,7 @@ import util.Questions.QuestionListAnswerTF;
 import util.Questions.QuestionListOptionsQO;
 import util.Questions.QuestionListOrderQO;
 import util.Questions.QuestionListQuestionsTF;
-import util.Questions.QuestionMultipleChoise;
+import util.Questions.QuestionMultipleChoice;
 import util.Questions.QuestionOrder;
 import util.Questions.QuestionTrueOrFalse;
 
@@ -160,7 +160,7 @@ public class TempQuestionResource {
 	@POST
 	@Path("/postQMC")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postTempQuestionMultipleChoise(QuestionMultipleChoise question) {
+	public Response postTempQuestionMultipleChoise(QuestionMultipleChoice question) {
 		
 		Transaction txn = datastore.newTransaction();
 		try {
@@ -222,7 +222,7 @@ public class TempQuestionResource {
 			String optionD = questionMCEntity.getString("optionD");
 			String correctOption = questionMCEntity.getString("correctOption");
 			
-			QuestionMultipleChoise question = new QuestionMultipleChoise(
+			QuestionMultipleChoice question = new QuestionMultipleChoice(
 					enunciated, questionS,
 					optionA, optionB,
 					optionC, optionD,
