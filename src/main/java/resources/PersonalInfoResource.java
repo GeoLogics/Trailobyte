@@ -2,13 +2,11 @@ package resources;
 
 
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -20,7 +18,7 @@ import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.KeyFactory;
-import com.google.cloud.datastore.PathElement;
+
 
 import com.google.cloud.datastore.Transaction;
 import com.google.cloud.datastore.Value;
@@ -33,7 +31,6 @@ import util.RegisterData;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class PersonalInfoResource {
 
-	private static final Logger LOG = Logger.getLogger(PersonalInfoResource.class.getName());
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 	private final Gson g = new Gson();

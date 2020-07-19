@@ -1,11 +1,8 @@
 package resources;
 
-import javax.ws.rs.Consumes;
+
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -24,13 +21,13 @@ import com.google.cloud.datastore.Transaction;
 public class Init {
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
-	
+
 	@POST
 	@Path("/createAdmin")
 	public Response createAdmin() {
 		Transaction txn = null;
 		Key userKey = datastore.newKeyFactory().setKind("User").newKey("ADMIN");
-		
+
 		try {
 			txn = datastore.newTransaction();
 			Entity user = Entity.newBuilder(userKey)
@@ -50,18 +47,18 @@ public class Init {
 				txn.rollback();
 		}
 	}
-		
+
 	@POST
 	@Path("/generateRoleTable")
 	public Response generateRoleTable() {
 		RoleResource roles = new RoleResource();
 		return roles.createRolesTable();
 	}
-	
-		
-	
-	
-	
-	
+
+
+
+
+
+
 
 }

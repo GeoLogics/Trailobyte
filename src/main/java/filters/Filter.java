@@ -22,50 +22,50 @@ import util.AuthToken;
 
 
 @Provider 
-public class Filter implements ContainerRequestFilter, ContainerResponseFilter {
-	
-	
+@PreMatching
+public class Filter implements ContainerRequestFilter, ContainerResponseFilter{
+
+
 	private static final Logger LOG = Logger.getLogger(Filter.class.getName());
-	private static final String PRIVATE_KEY = "privateKey";  
-	private static final String USERNAME = "username"; 
 	private final Utils utils = new Utils();
 	private final RoleResource roles = new RoleResource();
 	private final CacheResource cache = new CacheResource();
-	
+
 	public Filter() {}
-	
+
 	@Override
 	public void filter(ContainerRequestContext requestContext)throws IOException {  
-	
-		
-			String path = ((ContainerRequest) requestContext).getPath(false);
-			if(!path.equals("login/v1")&&!path.equals("register/v1")&&!path.contains("OPT3OP")&&!path.equals("query/byUser")&&!path.equals("query/byRating")) { 
-				
-				
-				 String authKey = requestContext.getHeaderString("Authorization").split(" ")[1];
-		         String username = requestContext.getHeaderString("username");
-		   
-		         try {
-					if(!cache.Authentication(authKey, username))
-					   	 throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build());
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		         
-		         
-		         	if(path.contains("OP")) {
-		         		String code = path.substring(path.indexOf("OP")+2, path.lastIndexOf("OP"));  
-		         		System.out.println(code);
-		       
-		         		if(!roles.checkPermissions(username, code))
-		         			throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have the necessary permissions for this operation.").build());
-			        
-		         }
-				
+
+
+		String path = ((ContainerRequest) requestContext).getPath(false);
+		if(!path.equals("login/v1")&&!path.equals("register/v1")&&!path.contains("OPT3OP")/*&&!path.equals("query/byUser")&&
+				!path.equals("query/byRating")&&!path.equals("query/listUsers")&&!path.equals("query/listTrails")&&!path.equals("query/listTrailsUnverified")*/) { 
+
+
+			String authKey = requestContext.getHeaderString("Authorization").split(" ")[1];
+			String username = requestContext.getHeaderString("username");
+
+			try {
+				if(!cache.Authentication(authKey, username))
+					throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build());
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		
+
+
+			if(path.contains("OP")) {
+				String code = path.substring(path.indexOf("OP")+2, path.lastIndexOf("OP"));  
+				System.out.println(code);
+
+				if(!roles.checkPermissions(username, code))
+					throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have the necessary permissions for this operation.").build());
+
+			}
+
+		}
+
 	}
 
 	@Override
@@ -74,11 +74,11 @@ public class Filter implements ContainerRequestFilter, ContainerResponseFilter {
 		responseContext.getHeaders().add("Access-Control-Allow-Methods", "HEAD,GET,PUT,POST,DELETE,OPTIONS");
 		responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
 		responseContext.getHeaders().add("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Authorization, username");
-	
-		
-		
-		
+
+
+
+
 	}
 
-	
+
 }
