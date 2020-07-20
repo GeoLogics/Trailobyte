@@ -1,33 +1,57 @@
 package util;
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Map;
+import com.google.cloud.datastore.Key;
+
 
 public class Trail {
 	
-	public List<Marker> markers;
 	public String name;
-	public Marker start;
-	public Marker end;
+	public String description;
+	public String trailImg;
+	public String creator;
 	
-	public Trail(String name) {
+	public String start;
+	public String end;
+	public List<Marker> markers;
+	//map that stores the keys to the trail's questions. (K,V) K - waypoints's name, V - List of Questions
+	public Map<String, List<Key>> trailQuestions;
+	
+	public double avgRating;
+	public int nRatings;
+	public double dist;
+	
+	public boolean verified;
+	
+	
+	
+	
+	public Trail() {}
+	
+	
+	public Trail(String name, String description, String trailImg, String creator, String start, String end, 
+				 List<Marker> markers, Map<String, List<Key>> trailQuestions, double avgRating, int nRatings, 
+				 double dist, boolean verified)
+	{	
+		this.name= name;
+		this.description = description;
+		this.trailImg = trailImg;
+		this.creator = creator;
+		 
+		this.start = start;
+		this.end = end;
+		this.markers = markers;
+		this.trailQuestions = trailQuestions;
 		
-		this.markers = new ArrayList<Marker>();
-		this.name=name;
+		this.avgRating = avgRating;
+		this.nRatings = nRatings;
+		this.dist = dist;
 		
+		this.verified = verified;
 	}
 
-	
-	public void addMarker(Marker marker) {
-		if(markers.isEmpty())
-			start = marker;
-		
-		markers.add(marker);
-	}
-	
-	public void addLast(Marker marker) {
-		end = marker;
-	}
 	
 	public int getNumberMarkers() {
 		return markers.size();

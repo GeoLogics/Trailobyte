@@ -17,6 +17,8 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.google.cloud.datastore.Key;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -26,8 +28,8 @@ import com.google.cloud.datastore.Transaction;
 import com.google.gson.Gson;
 
 import util.AuthToken;
+import util.CacheToken;
 import util.LoginData;
-import util.Validity;
 
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -36,6 +38,7 @@ public class LoginResource {
 	/**
 	 * Logger Object
 	 */
+	private final MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
@@ -52,34 +55,30 @@ public class LoginResource {
 		LOG.fine("Attempt to login user: " + data.username);
 
 		Key userKey = userKeyFactory.newKey(data.username);
-		Transaction txn = datastore.newTransaction();
+		//Transaction txn = datastore.newTransaction();
 
 		try {
-			Entity user = txn.get(userKey);
+			//Entity user = txn.get(userKey);
+			Entity user = datastore.get(userKey);
 			if( user != null ) {
 				String hashedPWD = user.getString("user_pwd");
 				if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
-					Validity validity = new Validity();
-					AuthToken token = new AuthToken(data.username, "User", validity);
 					LOG.info("User '" + data.username + "' logged in sucessfully.");
-
-
-					Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.username);
-					Entity tokenEntity = Entity.newBuilder(tokenKey).set("username", data.username).build();
-					txn.add(tokenEntity);
-
-					Key validityKey = datastore.newKeyFactory()
-							.addAncestor(PathElement.of("Token", data.username))
-							.setKind("Validity")
-							.newKey(data.username);
-
-					Entity validityEntity = Entity.newBuilder(validityKey).set("Validity", data.username)
-							.set("Verifier", validity.verifier)
-							.set("ExpirationData", validity.expirationData)
+					
+					AuthToken token = new AuthToken(data.username);
+					CacheToken cacheToken = new CacheToken(token.expirationData , token.verifier);
+					String cacheKey = data.username+"token";
+					syncCache.put(cacheKey, g.toJson(cacheToken).getBytes());
+						
+					/*Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.username);
+					Entity tokenEntity = Entity.newBuilder(tokenKey)
+							.set("verifier", token.verifier)
+							.set("creationData", token.creationData)
+							.set("expirationData", token.expirationData)
 							.build();
-					txn.add(validityEntity);
-					txn.commit();
-					return Response.ok(g.toJson(token)).build();				
+					txn.add(tokenEntity);*/
+					//txn.commit();
+					return Response.ok(g.toJson(token.verifier)).build();				
 
 				} else {
 					LOG.warning("Wrong password for username: " + data.username);
@@ -93,7 +92,7 @@ public class LoginResource {
 			}
 
 		} catch (Exception e) {
-			txn.rollback();
+			//txn.rollback();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 
