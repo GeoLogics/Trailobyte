@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import { StyleSheet, View, Text, Image, TouchableOpacity, Animated, Easing, Dimensions, Alert } from 'react-native';
 import { Actions, ActionConst } from 'react-native-router-flux';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import { Button, RadioButton, Paragraph, Dialog, Portal } from 'react-native-paper';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import Wallpaper from './Wallpaper';
@@ -30,12 +30,14 @@ export default class UserQuizzQuestionScreen extends React.Component {
             questionsQMC: [],
             questionsQO: [],
             questionsQTF: [],
+            isQuizzDialogVisible: false,
         };
         
         this.getNumberOfQuestions = this.getNumberOfQuestions.bind(this);
         this.getQuestion = this.getQuestion.bind(this);
         this.nextQuestion = this.nextQuestion.bind(this);
         this.finishQuizz = this.finishQuizz.bind(this);
+        this.exitQuizz = this.exitQuizz.bind(this);
     }
     
     componentDidMount() {
@@ -79,33 +81,36 @@ export default class UserQuizzQuestionScreen extends React.Component {
         
         if (nextType == 0) {
             var nextQMCId = Math.floor(Math.random() * this.state.numberOfQMC) + 1;
-            if (this.state.questionsQMC && this.state.questionsQMC.length > 0) {
+            if (this.state.questionsQMC && this.state.questionsQMC.length) {
                 if (this.state.questionsQMC.every((id) => id == nextQMCId)) {
+                    var nextId = id;
                     do {
                         nextQMCId = Math.floor(Math.random() * this.state.numberOfQMC) + 1;
-                    } while (id == nextQMCId);
+                    } while (nextId == nextQMCId);
                 }
             }
             this.state.questionsQMC.push(nextQMCId);
             this.getQuestion('QMC', nextQMCId.toString());
         } else if (nextType == 1) {
             var nextQOId = Math.floor(Math.random() * this.state.numberOfQO) + 1;
-            if (this.state.questionsQO && this.state.questionsQO.length > 0) {
+            if (this.state.questionsQO && this.state.questionsQO.length) {
                 if (this.state.questionsQO.every((id) => id == nextQOId)) {
+                    var nextId = id;
                     do {
                         nextQOId = Math.floor(Math.random() * this.state.numberOfQO) + 1;
-                    } while (id == nextQOId);
+                    } while (nextId == nextQOId);
                 }
             }
             this.state.questionsQO.push(nextQOId);
             this.getQuestion('QO', nextQOId.toString());
         } else if (nextType == 2) {
             var nextQTFId = Math.floor(Math.random() * this.state.numberOfQTF) + 1;
-            if (this.state.questionsQTF && this.state.questionsQTF.length > 0) {
+            if (this.state.questionsQTF && this.state.questionsQTF.length) {
                 if (this.state.questionsQTF.every((id) => id == nextQTFId)) {
+                    var nextId = id;
                     do {
                         nextQTFId = Math.floor(Math.random() * this.state.numberOfQTF) + 1;
-                    } while (id == nextQTFId);
+                    } while (nextId == nextQTFId);
                 }
             }
             this.state.questionsQTF.push(nextQTFId);
@@ -170,7 +175,11 @@ export default class UserQuizzQuestionScreen extends React.Component {
     }
     
     finishQuizz() {
-        Alert.alert("Resultado", this.state.answerCounter + "/" + this.state.questionCounter);
+        this.setState({isQuizzDialogVisible: true});
+    }
+    
+    exitQuizz() {
+        this.setState({isQuizzDialogVisible: false});
         Actions.userQuizzScreen();
     }
     
@@ -221,7 +230,7 @@ export default class UserQuizzQuestionScreen extends React.Component {
             else if (questionType == 'QTF')
                 this.setState({numberOfQTF: data});
         })
-        .catch((error) => { alert(error); })
+        .catch((error) => { console.log(error); })
         .done();
     }
     
@@ -267,7 +276,7 @@ export default class UserQuizzQuestionScreen extends React.Component {
             console.log(data);
             this.setState({question: data});
         })
-        .catch((error) => { alert(error); })
+        .catch((error) => { console.log(error); })
         .done();
     }
     
@@ -277,6 +286,17 @@ export default class UserQuizzQuestionScreen extends React.Component {
                 <View style={styles.container}>
                     {this.showQuestion()}
                     {this.showButtons()}
+                    <Portal>
+                        <Dialog visible={this.state.isQuizzDialogVisible} onDismiss={() => this.setState({isQuizzDialogVisible: false})}>
+                            <Dialog.Title>Resultado</Dialog.Title>
+                            <Dialog.Content>
+                                <Paragraph>Respondeu corretamente a {this.state.answerCounter} de {this.state.questionCounter} questões!</Paragraph>
+                            </Dialog.Content>
+                            <Dialog.Actions>
+                                <Button onPress={() => this.exitQuizz()}>Ok</Button>
+                            </Dialog.Actions>
+                        </Dialog>
+                  </Portal>
                 </View>
             </Wallpaper>
         );

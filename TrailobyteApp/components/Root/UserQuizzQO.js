@@ -19,120 +19,114 @@ export default class UserQuizzQO extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.text}>Quest&#227;o {this.props.counter}</Text>
-                <ScrollView style={styles.question}>  
-                    <Text style={styles.text}>{this.props.enunciated}</Text>
-                </ScrollView>
-                <ScrollView style={styles.question}>  
-                    <Text style={styles.text}>{this.props.question}</Text>
-                </ScrollView>
-                
-                <ScrollView nestedScrollEnabled = {true}>
-                    <View style={styles.textViewOptionMain} >
-                        <Text style={styles.textOption}>Op&#231;&#227;o A</Text>
-                        <View style={styles.orderInput}>
-                            <TextInput 
-                                style={styles.numberInput}
-                                keyboardType='numeric'
-                                onChangeText={orderOption1 => this.setState({ orderOption1 })}
-                                value={this.state.orderOption1}
-                                maxLength={1}
-                            />
+                <Text style={styles.text}>Questão {this.props.counter}</Text>
+                <View style={styles.question}>
+                    <ScrollView style={{marginBottom: 10}}> 
+                        <Text style={styles.text}>{this.props.enunciated}</Text>
+                    </ScrollView>
+                    <ScrollView>  
+                        <Text style={styles.text}>{this.props.question}</Text>
+                    </ScrollView>
+                </View>
+                <View style={styles.answer}>
+                    <ScrollView nestedScrollEnabled = {true}>
+                        <View style={styles.textViewOptionMain} >
+                            <Text style={styles.textOption}>Opção A</Text>
+                            <View style={styles.orderInput}>
+                                <TextInput 
+                                    style={styles.numberInput}
+                                    keyboardType='numeric'
+                                    onChangeText={orderOption1 => this.setState({ orderOption1 })}
+                                    value={this.state.orderOption1}
+                                    maxLength={1}
+                                />
+                            </View>
+                            <View style={styles.textViewOption} >
+                                <ScrollView nestedScrollEnabled = {true}>
+                                    <Text>
+                                        {this.props.options ? this.props.options.options[0] : ''}
+                                    </Text>
+                                </ScrollView>
+                            </View>
                         </View>
-                        
-                        <View style={styles.textViewOption} >
-                            <ScrollView nestedScrollEnabled = {true}>
-                                <Text>
-                                    {this.props.options ? this.props.options.options[0] : ''}
-                                </Text>
-                            </ScrollView>
+                        <View style={styles.textViewOptionMain} >
+                            <Text style={styles.textOption}>Opção B</Text>
+                            <View style={styles.orderInput} >
+                                <TextInput 
+                                    style={styles.numberInput}
+                                    keyboardType='numeric'
+                                    onChangeText={orderOption2 => this.setState({ orderOption2 })}
+                                    value={this.state.orderOption2}
+                                    maxLength={1}
+                                />
+                            </View>
+                            <View style={styles.textViewOption} >
+                                <ScrollView nestedScrollEnabled = {true}>
+                                    <Text>
+                                        {this.props.options ? this.props.options.options[1] : ''}
+                                    </Text>
+                                </ScrollView>
+                            </View>
                         </View>
-                    </View>
-                    
-                    <View style={styles.textViewOptionMain} >
-                        <Text style={styles.textOption}>Op&#231;&#227;o B</Text>
-                        <View style={styles.orderInput} >
-                            <TextInput 
-                                style={styles.numberInput}
-                                keyboardType='numeric'
-                                onChangeText={orderOption2 => this.setState({ orderOption2 })}
-                                value={this.state.orderOption2}
-                                maxLength={1}
-                            />
+                        <View style={styles.textViewOptionMain} >
+                            <Text style={styles.textOption}>Opção C</Text>
+                            <View style={styles.orderInput}>
+                                <TextInput 
+                                    style={styles.numberInput}
+                                    keyboardType='numeric'
+                                    onChangeText={orderOption3 => this.setState({ orderOption3 })}
+                                    value={this.state.orderOption3}
+                                    maxLength={1}
+                                />
+                            </View>
+                            <View style={styles.textViewOption} >
+                                <ScrollView nestedScrollEnabled = {true}>
+                                    <Text>
+                                        {this.props.options ? this.props.options.options[2] : ''}
+                                    </Text>
+                                </ScrollView>
+                            </View>
                         </View>
-                        
-                        <View style={styles.textViewOption} >
-                            <ScrollView nestedScrollEnabled = {true}>
-                                <Text>
-                                    {this.props.options ? this.props.options.options[1] : ''}
-                                </Text>
-                            </ScrollView>
+                        <View style={styles.textViewOptionMain} >
+                            <Text style={styles.textOption}>Opção D</Text>
+                            <View style={styles.orderInput}>
+                                <TextInput 
+                                    style={styles.numberInput}
+                                    keyboardType='numeric'
+                                    onChangeText={orderOption4 => this.setState({ orderOption4 })}
+                                    value={this.state.orderOption4}
+                                    maxLength={1}
+                                />
+                            </View>
+                            <View style={styles.textViewOption} >
+                                <ScrollView nestedScrollEnabled = {true}>
+                                    <Text>
+                                        {this.props.options ? this.props.options.options[3] : ''}
+                                    </Text>
+                                </ScrollView>
+                            </View>
                         </View>
-                    </View>
-                    
-                    <View style={styles.textViewOptionMain} >
-                        <Text style={styles.textOption}>Op&#231;&#227;o C</Text>
-                        <View style={styles.orderInput}>
-                            <TextInput 
-                                style={styles.numberInput}
-                                keyboardType='numeric'
-                                onChangeText={orderOption3 => this.setState({ orderOption3 })}
-                                value={this.state.orderOption3}
-                                maxLength={1}
-                            />
+                        <View style={styles.textViewOptionMain} >
+                            <Text style={styles.textOption}>Opção E</Text>
+                            <View style={styles.orderInput}>
+                                <TextInput 
+                                    style={styles.numberInput}
+                                    keyboardType='numeric'
+                                    onChangeText={orderOption5 => this.setState({ orderOption5 })}
+                                    value={this.state.orderOption5}
+                                    maxLength={1}
+                                />
+                            </View>
+                            <View style={styles.textViewOption} >
+                                <ScrollView nestedScrollEnabled = {true}>
+                                    <Text>
+                                        {this.props.options ? this.props.options.options[4] : ''}
+                                    </Text>
+                                </ScrollView>
+                            </View>
                         </View>
-                        
-                        <View style={styles.textViewOption} >
-                            <ScrollView nestedScrollEnabled = {true}>
-                                <Text>
-                                    {this.props.options ? this.props.options.options[2] : ''}
-                                </Text>
-                            </ScrollView>
-                        </View>
-                    </View>
-                    
-                    <View style={styles.textViewOptionMain} >
-                        <Text style={styles.textOption}>Op&#231;&#227;o D</Text>
-                        <View style={styles.orderInput}>
-                            <TextInput 
-                                style={styles.numberInput}
-                                keyboardType='numeric'
-                                onChangeText={orderOption4 => this.setState({ orderOption4 })}
-                                value={this.state.orderOption4}
-                                maxLength={1}
-                            />
-                        </View>
-                        
-                        <View style={styles.textViewOption} >
-                            <ScrollView nestedScrollEnabled = {true}>
-                                <Text>
-                                    {this.props.options ? this.props.options.options[3] : ''}
-                                </Text>
-                            </ScrollView>
-                        </View>
-                    </View>
-                    
-                    <View style={styles.textViewOptionMain} >
-                        <Text style={styles.textOption}>Op&#231;&#227;o E</Text>
-                        <View style={styles.orderInput}>
-                            <TextInput 
-                                style={styles.numberInput}
-                                keyboardType='numeric'
-                                onChangeText={orderOption5 => this.setState({ orderOption5 })}
-                                value={this.state.orderOption5}
-                                maxLength={1}
-                            />
-                        </View>
-                        
-                        <View style={styles.textViewOption} >
-                            <ScrollView nestedScrollEnabled = {true}>
-                                <Text>
-                                    {this.props.options ? this.props.options.options[4] : ''}
-                                </Text>
-                            </ScrollView>
-                        </View>
-                    </View>
-                </ScrollView>
+                    </ScrollView>
+                </View>
             </View>
         );
     }
@@ -149,12 +143,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         margin: 20,
-        alignItems: 'flex-end',
-        justifyContent: 'flex-end',
+        flexDirection: 'column',
+        alignSelf: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
     },
     question: {
-        maxHeight: 400,
-        marginTop: 10,
+        marginBottom: 20,
+        width: 300,
+        height: 300,
+        justifyContent: 'center',
+    },
+    answer: {
+        width: 300,
+        height: 300,
+        justifyContent: 'center',
     },
     text: {
         marginBottom: 10,
@@ -167,19 +170,20 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: Colors.orange500,
         height: 30,
-        justifyContent: "flex-start",
-        textAlignVertical: 'top',
     },
     textViewOptionMain: {
-        top: 10,
+        borderWidth: 2,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.6)',
     },
     textViewOption: {
-        maxHeight: 160,
         borderColor: 'black',
-        marginTop: -42,
-        marginLeft: 35,
-        borderWidth: 3,
-        padding: 0,
+        backgroundColor: 'white',
+        marginTop: -40,
+        marginBottom: 20,
+        marginLeft: 45,
+        marginRight: 35,
+        borderWidth: 2,
      },
      orderInput: {
         borderColor: 'black',
@@ -187,10 +191,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'silver',
         width:30,
         height: 40,
-        marginTop:0,
+        marginLeft: 10,
      },
      numberInput: {
         marginTop: -3,
-        width:100,
+        width: 100,
      },
 });

@@ -15,90 +15,91 @@ export default class UserQuizzQMC extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.text}>Op&#231;&#227;o {this.props.counter}</Text>
-                <ScrollView style={styles.question}>  
-                    <Text style={styles.text}>{this.props.enunciated}</Text>
-                </ScrollView>
-                <ScrollView style={styles.question}>  
-                    <Text style={styles.text}>{this.props.question}</Text>
-                </ScrollView>
-                <ScrollView nestedScrollEnabled = {true}>
-                    <RadioButton.Group
-                        onValueChange={selectedOption => this.setState({ selectedOption })}
-                        value={this.state.selectedOption}>
-                            <View style={styles.textViewOptionMain} >
-                                <Text style={styles.textOption}>Op&#231;&#227;o A</Text>
-                                <View style={styles.radioButtons} >
-                                    <RadioButton 
-                                        value = "A" 
-                                        color={Colors.orange100} 
-                                        uncheckedColor={Colors.orange100}
-                                    />
+                <Text style={styles.text}>Questão {this.props.counter}</Text>
+                <View style={styles.question}>
+                    <ScrollView style={{marginBottom: 10}}>  
+                        <Text style={styles.text}>{this.props.enunciated}</Text>
+                    </ScrollView>
+                    <ScrollView>  
+                        <Text style={styles.text}>{this.props.question}</Text>
+                    </ScrollView>
+                </View>
+                <View style={styles.answer}>
+                    <ScrollView nestedScrollEnabled = {true}>
+                        <RadioButton.Group
+                            onValueChange={selectedOption => this.setState({ selectedOption })}
+                            value={this.state.selectedOption}>
+                                <View style={styles.textViewOptionMain} >
+                                    <Text style={styles.textOption}>Opção A</Text>
+                                    <View style={styles.radioButtons} >
+                                        <RadioButton 
+                                            value = "A" 
+                                            color={Colors.orange100} 
+                                            uncheckedColor={Colors.orange100}
+                                        />
+                                    </View>
+                                    <View style={styles.textViewOption} >
+                                        <ScrollView nestedScrollEnabled = {true}>
+                                            <Text>
+                                                {this.props.optionA}
+                                            </Text>
+                                        </ScrollView>
+                                    </View>
                                 </View>
-                                <View style={styles.textViewOption} >
-                                    <ScrollView nestedScrollEnabled = {true}>
-                                        <Text>
-                                            {this.props.optionA}
-                                        </Text>
-                                    </ScrollView>
+                                <View style={styles.textViewOptionMain} >
+                                    <Text style={styles.textOption}>Opção B</Text>
+                                    <View style={styles.radioButtons} >
+                                        <RadioButton 
+                                            value = "B" 
+                                            color={Colors.orange100} 
+                                            uncheckedColor={Colors.orange100}
+                                        />
+                                    </View>
+                                    <View style={styles.textViewOption} >
+                                        <ScrollView nestedScrollEnabled = {true}>
+                                            <Text>
+                                                {this.props.optionB}
+                                            </Text>
+                                        </ScrollView>
+                                    </View>
                                 </View>
-                            </View>
-                            
-                            <View style={styles.textViewOptionMain} >
-                                <Text style={styles.textOption}>Op&#231;&#227;o B</Text>
-                                <View style={styles.radioButtons} >
-                                    <RadioButton 
-                                        value = "B" 
-                                        color={Colors.orange100} 
-                                        uncheckedColor={Colors.orange100}
-                                    />
+                                <View style={styles.textViewOptionMain} >
+                                    <Text style={styles.textOption}>Opção C</Text>
+                                    <View style={styles.radioButtons} >
+                                        <RadioButton 
+                                            value = "C" 
+                                            color={Colors.orange100} 
+                                            uncheckedColor={Colors.orange100}
+                                        />
+                                    </View>
+                                    <View style={styles.textViewOption} >
+                                        <ScrollView nestedScrollEnabled = {true}>
+                                            <Text>
+                                                {this.props.optionC}
+                                            </Text>
+                                        </ScrollView>
+                                    </View>
                                 </View>
-                                <View style={styles.textViewOption} >
-                                    <ScrollView nestedScrollEnabled = {true}>
-                                        <Text>
-                                            {this.props.optionB}
-                                        </Text>
-                                    </ScrollView>
+                                <View style={styles.textViewOptionMain} >
+                                    <Text style={styles.textOption}>Opção D</Text>
+                                    <View style={styles.radioButtons} >
+                                        <RadioButton 
+                                            value = "D" 
+                                            color={Colors.orange100} 
+                                            uncheckedColor={Colors.orange100}
+                                        />
+                                    </View>
+                                    <View style={styles.textViewOption} >
+                                        <ScrollView nestedScrollEnabled = {true}>
+                                            <Text>
+                                                {this.props.optionD}
+                                            </Text>
+                                        </ScrollView>
+                                    </View>
                                 </View>
-                            </View>
-                            
-                            <View style={styles.textViewOptionMain} >
-                                <Text style={styles.textOption}>Op&#231;&#227;o C</Text>
-                                <View style={styles.radioButtons} >
-                                    <RadioButton 
-                                        value = "C" 
-                                        color={Colors.orange100} 
-                                        uncheckedColor={Colors.orange100}
-                                    />
-                                </View>
-                                <View style={styles.textViewOption} >
-                                    <ScrollView nestedScrollEnabled = {true}>
-                                        <Text>
-                                            {this.props.optionC}
-                                        </Text>
-                                    </ScrollView>
-                                </View>
-                            </View>
-                            
-                            <View style={styles.textViewOptionMain} >
-                                <Text style={styles.textOption}>Op&#231;&#227;o D</Text>
-                                <View style={styles.radioButtons} >
-                                    <RadioButton 
-                                        value = "D" 
-                                        color={Colors.orange100} 
-                                        uncheckedColor={Colors.orange100}
-                                    />
-                                </View>
-                                <View style={styles.textViewOption} >
-                                    <ScrollView nestedScrollEnabled = {true}>
-                                        <Text>
-                                            {this.props.optionD}
-                                        </Text>
-                                    </ScrollView>
-                                </View>
-                            </View>
-                    </RadioButton.Group>
-                </ScrollView>
+                        </RadioButton.Group>
+                    </ScrollView>
+                </View>
             </View>
         );
     }
@@ -118,13 +119,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         margin: 20,
-        alignItems: 'flex-end',
-        justifyContent: 'flex-end',
+        flexDirection: 'column',
+        alignSelf: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
     },
     question: {
-        maxHeight: 400,
-        marginBottom: 10,
-        marginTop: 10,
+        marginBottom: 20,
+        width: 300,
+        height: 300,
+        justifyContent: 'center',
+    },
+    answer: {
+        width: 300,
+        height: 300,
+        justifyContent: 'center',
     },
     text: {
         marginBottom: 10,
@@ -137,20 +146,20 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: Colors.orange500,
         height: 30,
-        justifyContent: "flex-start",
-        textAlignVertical: 'top',
     },
     textViewOptionMain: {
-        top: 10,
+        borderWidth: 2,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.6)',
     },
     textViewOption: {
-        maxHeight: 160,
         borderColor: 'black',
+        backgroundColor: 'white',
         marginTop: -40,
-        marginBottom: 10,
+        marginBottom: 20,
         marginLeft: 35,
-        borderWidth: 3,
-        padding: 0,
+        marginRight: 35,
+        borderWidth: 2,
      },
      radioButtons: {
         top: -10,

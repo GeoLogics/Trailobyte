@@ -69,7 +69,7 @@ export default class LoginScreen extends React.Component {
             })
         .then(async function(data) {
             console.log(data);
-            const verifier = data;
+            const verifier = data.verifier;
             try {
                 // Remove items first if they exist
                 await AsyncStorage.removeItem('username');
@@ -91,7 +91,7 @@ export default class LoginScreen extends React.Component {
         .then(() => {
             this.setState({userIsLoggedIn: true});
         })
-        .catch((error) => { alert(error); })
+        .catch((error) => { console.log(error); })
         .done();
     }
     

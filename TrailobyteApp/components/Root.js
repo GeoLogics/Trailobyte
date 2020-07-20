@@ -4,6 +4,7 @@ import { Router, Scene } from 'react-native-router-flux';
 import SplashScreen from './Root/SplashScreen';
 import LoginScreen from './Root/LoginScreen';
 import RegisterScreen from './Root/RegisterScreen';
+import UserTrailListScreen from './Root/UserTrailListScreen';
 import UserTrailScreen from './Root/UserTrailScreen';
 import UserQuizzScreen from './Root/UserQuizzScreen';
 import UserQuizzQuestionScreen from './Root/UserQuizzQuestionScreen';
@@ -30,6 +31,11 @@ export default class Main extends React.Component {
                         animation='fade'
                         hideNavBar={true}
                     />
+                    <Scene key="userTrailListScreen"
+                        component={UserTrailListScreen}
+                        animation='fade'
+                        hideNavBar={true}
+                    />
                     <Scene key="userTrailScreen"
                         component={UserTrailScreen}
                         animation='fade'
@@ -53,5 +59,5 @@ export default class Main extends React.Component {
                 </Scene>
             </Router>
         );
-	}
+    }
 }

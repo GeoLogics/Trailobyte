@@ -84,7 +84,7 @@ export default class RegisterScreen extends React.Component {
         .then(() => {
             this.setState({userIsRegistered: true});
         })
-        .catch((error) => { alert(error); })
+        .catch((error) => { console.log(error); })
         .done();
     }
     

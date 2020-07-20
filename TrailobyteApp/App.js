@@ -1,5 +1,6 @@
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Provider as PaperProvider } from 'react-native-paper';
 
 import Root from "./components/Root";
 
@@ -7,7 +8,9 @@ export default class App extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <Root />
+                <PaperProvider>
+                    <Root />
+                </PaperProvider>
             </View>
         );
     }

@@ -109,7 +109,7 @@ export default class UserAreaScreen extends React.Component {
             this.setState({mobilePhone: data.mobilePhone});
             this.setState({address: data.address});
         })
-        .catch((error) => { alert(error); })
+        .catch((error) => { console.log(error); })
         .done();
     }    
     
@@ -162,7 +162,7 @@ export default class UserAreaScreen extends React.Component {
                     throw new Error(response.status);
                 }
             })
-        .catch((error) => { alert(error); })
+        .catch((error) => { console.log(error); })
         .done();
     }
     

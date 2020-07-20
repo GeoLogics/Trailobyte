@@ -25,7 +25,8 @@ export default class UserMenu extends React.Component {
         
         this.growAnimated = new Animated.Value(0);
         this._onPressLogout = this._onPressLogout.bind(this);
-        this._onPressUserTrail = this._onPressUserTrail.bind(this);
+        this._onPressUserTrailList = this._onPressUserTrailList.bind(this);
+        this._onPressUserQuizz = this._onPressUserQuizz.bind(this);
         this._onPressUserArea = this._onPressUserArea.bind(this);
         this.logout = this.logout.bind(this);
     }
@@ -48,8 +49,8 @@ export default class UserMenu extends React.Component {
         }, 500);
     }
     
-    _onPressUserTrail() {
-        Actions.userTrailScreen();
+    _onPressUserTrailList() {
+        Actions.userTrailListScreen();
     }
     
     _onPressUserQuizz() {
@@ -105,7 +106,7 @@ export default class UserMenu extends React.Component {
                 // Failed to save data in AsyncStorage
             }
         })
-        .catch((error) => { alert(error); })
+        .catch((error) => { console.log(error); })
         .done();
     }
     
@@ -118,7 +119,7 @@ export default class UserMenu extends React.Component {
             <View style={styles.container}>
                 <View style={styles.navbar}>
                     <TouchableOpacity
-                        onPress={this._onPressUserTrail}
+                        onPress={this._onPressUserTrailList}
                         style={styles.button}>
                             <Image style={styles.image} source={trailImg} />
                             <Text style={styles.text}>Percursos</Text>

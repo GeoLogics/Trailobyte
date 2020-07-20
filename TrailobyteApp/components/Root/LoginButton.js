@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, TouchableOpacity, Text, Animated, Easing, Image, Alert, View, Dimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, Animated, Easing, Image, View, Dimensions } from 'react-native';
 import {Actions, ActionConst} from 'react-native-router-flux';
 
 import spinner from '../../images/loading.gif';
@@ -42,7 +42,7 @@ export default class LoginButton extends React.Component {
 
         setTimeout(() => {
             if (this.props.isLoggedIn()) {
-                Actions.userTrailScreen();
+                Actions.userTrailListScreen();
             }
             this.setState({isLoading: false});
             this.buttonAnimated.setValue(0);
