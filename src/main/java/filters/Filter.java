@@ -39,7 +39,7 @@ public class Filter implements ContainerRequestFilter, ContainerResponseFilter{
 
 		String path = ((ContainerRequest) requestContext).getPath(false);
 		if(!path.equals("login/v1")&&!path.equals("register/v1")&&!path.contains("OPT3OP")&&!path.equals("query/byUser")&&
-				!path.equals("query/byRating")&&!path.equals("query/cacheUpdate")/*&&!path.equals("query/listUsers")&&!path.equals("query/listTrails")&&!path.equals("query/listTrailsUnverified")*/) { 
+				!path.equals("query/byRating")/*&&!path.equals("query/cacheUpdate")/*&&!path.equals("query/listUsers")&&!path.equals("query/listTrails")&&!path.equals("query/listTrailsUnverified")*/) { 
 
 
 			String authKey = requestContext.getHeaderString("Authorization").split(" ")[1];

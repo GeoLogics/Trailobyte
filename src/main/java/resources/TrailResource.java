@@ -130,7 +130,7 @@ public class TrailResource {
 			while(iterator.hasNext()) {
 				item = iterator.next();
 				InputStream stream = item.openStream();
-				if(item.isFormField()) {
+				if(item.isFormField()&&item!=null) {
 					JsonParser jsonParser = new JsonParser();
 					JsonObject jsonObject = (JsonObject)jsonParser.parse(new InputStreamReader(item.openStream(), "UTF-8"));
 					//JsonObject jsonObject = (JsonObject) JsonParser.parseReader(new InputStreamReader(item.openStream(), "UTF-8"));
@@ -421,7 +421,7 @@ public class TrailResource {
 		case "E4" :	verificationLevel = 1; break;
 		case "BO" : verificationLevel = 1; break;
 		case "BOQ": verificationLevel = 2; break;
-		//case "ADMIN": verificationLevel = 2; break;
+		case "ADMIN": verificationLevel = 2; break;
 		default	  : verificationLevel = 0; break;
 		}
 
@@ -463,7 +463,6 @@ public class TrailResource {
 				Key questionKey = questionKeyFactory.newKey(keyString); 
 
 
-				//Random generator = new Random();//delete
 
 				Entity questionEntity = Entity.newBuilder(questionKey)
 						.set("questionKey", keyString)
@@ -471,7 +470,6 @@ public class TrailResource {
 						.set("trailName", trailQuestion.trailName)
 						.set("markerName", trailQuestion.markerName)
 						.set("verificationLevel", (int) verificationLevel)
-						//.set("verificationLevel", (int) generator.nextInt(5)) //delete
 
 						.set("question", trailQuestion.question)
 						.set("optionA", trailQuestion.optionA)
