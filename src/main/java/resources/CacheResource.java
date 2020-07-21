@@ -26,7 +26,7 @@ public class CacheResource {
 
 
 
-	public boolean Authentication(String authKey, String username) throws ClassNotFoundException, IOException{
+	/*public boolean Authentication(String authKey, String username) throws ClassNotFoundException, IOException{
 
 		String verifier;
 		long expirationDate;
@@ -53,13 +53,49 @@ public class CacheResource {
 			syncCache.put(cacheKey, g.toJson(new CacheToken(expirationDate, verifier)).getBytes());
 		}
 		if(authKey.equals(verifier))  {
-			if(System.currentTimeMillis() < expirationDate) {
-				syncCache.put(cacheKey, g.toJson(new CacheToken(System.currentTimeMillis()+1000*60, verifier)).getBytes());
+			if(System.currentTimeMillis() < expirationDate) {//7 dias
+				syncCache.put(cacheKey, g.toJson(new CacheToken(System.currentTimeMillis()+1000*60*60*7, verifier)).getBytes());
 				return true;
 			}
-				
+
 			else {
 				syncCache.delete(username+"token");
+				return false;
+			}
+		}
+
+
+		return false;
+	}*/ 
+
+	public boolean Authentication(String authKey, String username) throws ClassNotFoundException, IOException{
+
+		String verifier = null;
+		long expirationDate = 0;
+		String cacheKey = username+"token";
+
+
+		byte[] value = (byte[]) syncCache.get(cacheKey);
+		if(value != null) {
+			//CacheToken token = (CacheToken) deserializeByteArray(value);
+			CacheToken token = g.fromJson(new String(value), CacheToken.class);
+			verifier = token.verifier;
+			expirationDate = token.expirationDate;
+			System.out.println("XD1");
+		}
+
+
+		if(authKey.equals(verifier))  {
+			if(System.currentTimeMillis() < expirationDate) {//refresh da sessao cada vez q se faz 1 pedido - 1 hora 1000*60*60
+				syncCache.put(cacheKey, g.toJson(new CacheToken(System.currentTimeMillis()+1000*60*60*24*7, verifier)).getBytes());
+				System.out.println("XD2");
+				return true;
+
+			}
+
+			else {//remover sessão da cache por ser inválida
+				syncCache.delete(username+"token");
+				System.out.println("XD3");
 				return false;
 			}
 		}

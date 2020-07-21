@@ -56,8 +56,6 @@ public class LogoutResource {
 			}	
 
 			String cacheKey = username+"token";
-			boolean x = syncCache.contains(cacheKey);
-			System.out.println(x);
 			byte[] value = (byte[]) syncCache.get(cacheKey);
 
 			if(value != null) {

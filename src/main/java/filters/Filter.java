@@ -45,7 +45,7 @@ public class Filter implements ContainerRequestFilter, ContainerResponseFilter{
 			String authKey = requestContext.getHeaderString("Authorization").split(" ")[1];
 			String username = requestContext.getHeaderString("username");
 
-			try {
+			try {//mudar codigo de erro para reiniciar app
 				if(!cache.Authentication(authKey, username))
 					throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build());
 			} catch (ClassNotFoundException e) {
