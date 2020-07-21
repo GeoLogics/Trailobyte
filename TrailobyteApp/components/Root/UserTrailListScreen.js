@@ -295,9 +295,11 @@ export default class UserTrailListScreen extends React.Component {
                             listType: item.value
                         })}
                     />
-                    <ScrollView style={styles.trailView}>
-                        {this.renderTrailList()}
-                    </ScrollView>
+                    <View style={styles.trailView}>
+                        <ScrollView>
+                            {this.renderTrailList()}
+                        </ScrollView>
+                    </View>
                 </View>
                 <UserMenu />
             </Wallpaper>
@@ -332,7 +334,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
     },
     trailView: {
-        minHeight: SCREEN_HEIGHT - 100,
+        minHeight: SCREEN_HEIGHT - 180,
         backgroundColor: 'rgba(255, 255, 255, 0.6)',
     }
 });

@@ -61,6 +61,8 @@ export default class UserTrailScreen extends React.Component {
             isTrailReviewDialogVisible: false,
             isTrailActive: false,
             isTrailQuizzActive: false,
+            isTrailSelectedMarkerDialogVisible: false,
+            trailSelectedMarker: [],
             trailReviewRating: 0,
             time: 0,
             distance: 0,
@@ -485,17 +487,22 @@ export default class UserTrailScreen extends React.Component {
                 latitude: marker.coords.lat,
                 longitude: marker.coords.lng
             }}>
-                <Callout style={styles.trailMarkerCallout}>
+                <Callout 
+                    style={styles.trailMarkerCallout}
+                    onPress={() => {this.setState({
+                        trailSelectedMarker: marker,
+                        isTrailSelectedMarkerDialogVisible: true,
+                    })}}>
                     <View style={styles.trailMarkerCalloutView}>
                         <Text style={styles.trailMarkerCalloutText}>{marker.name}</Text>
-                        <Text>
+                        <Text style={{top: -40}}>
                             <Image source={marker.imgURL ? {uri: marker.imgURL} : null} style={styles.trailMarkerCalloutImage} />
                         </Text>
                     </View>
                 </Callout>
             </Marker >);
     }
-
+    
     checkStartTrail() {
         this.setState({isStartTrailDialogVisible: false});
         if (this.state.trailQuizzQuestions && this.state.trailQuizzQuestions.length) {
@@ -678,6 +685,22 @@ export default class UserTrailScreen extends React.Component {
                         </TouchableOpacity>
                     }
                     <Portal>
+                        <Dialog visible={this.state.isTrailSelectedMarkerDialogVisible} onDismiss={() => this.setState({isTrailSelectedMarkerDialogVisible: false})}>
+                            <Dialog.Title style={{alignSelf: 'center'}}>{this.state.trailSelectedMarker.name}</Dialog.Title>
+                            <Dialog.Content>
+                                <Paragraph style={{marginBottom: 10}}>{this.state.trailSelectedMarker.content}</Paragraph>
+                                { this.state.trailSelectedMarker.coords && 
+                                    <Paragraph>Latitude: {this.state.trailSelectedMarker.coords.lat}</Paragraph>
+                                }
+                                { this.state.trailSelectedMarker.coords &&
+                                    <Paragraph>Longitude: {this.state.trailSelectedMarker.coords.lng}</Paragraph>
+                                }
+                                <Image source={this.state.trailSelectedMarker.imgURL ? {uri: this.state.trailSelectedMarker.imgURL} : null} style={{alignSelf: 'center', marginTop: 20, width: 300, height: 200}} />
+                            </Dialog.Content>
+                            <Dialog.Actions>
+                                <Button onPress={() => this.setState({isTrailSelectedMarkerDialogVisible: false})}>Ok</Button>
+                            </Dialog.Actions>
+                        </Dialog>
                         <Dialog visible={this.state.isStartTrailDialogVisible} onDismiss={() => this.setState({isStartTrailDialogVisible: false})}>
                             <Dialog.Title>Iniciar percurso</Dialog.Title>
                             <Dialog.Content>
@@ -808,6 +831,7 @@ const styles = StyleSheet.create({
     trailTitleText: {
         paddingTop: 20,
         paddingLeft: 10,
+        marginBottom: 20,
         fontSize: 16,
         fontWeight: '900',
         color: 'black',
@@ -829,18 +853,18 @@ const styles = StyleSheet.create({
     },
     trailMarkerCalloutView: {
         paddingTop: 10,
-        width: 120,
-        height: 120,
+        width: 100,
+        height: 100,
         alignItems: 'center',
     },
     trailMarkerCalloutText: {
         fontSize: 12,
-        fontWeight: '900',
+        fontWeight: '400',
         color: 'black',
     },
     trailMarkerCalloutImage: {
         width: 100,
-        height: 80,
+        height: 100,
     },
     startButton: {
         position: 'relative',

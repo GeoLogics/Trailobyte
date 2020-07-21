@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import { StyleSheet, ScrollView, View, Text, TextInput, Image, TouchableOpacity, Animated, Easing, Dimensions } from 'react-native';
 import { Colors } from 'react-native-paper';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 export default class UserQuizzQO extends React.Component {
     constructor(props) {
@@ -20,27 +21,51 @@ export default class UserQuizzQO extends React.Component {
         return (
             <View style={styles.container}>
                 <Text style={styles.text}>Questão {this.props.counter}</Text>
-                <View style={styles.question}>
-                    <ScrollView style={{marginBottom: 10}}> 
-                        <Text style={styles.text}>{this.props.enunciated}</Text>
+                    <ScrollView 
+                        contentContainerStyle={{flexGrow: 1}} 
+                        style={{marginBottom: 20}}> 
+                        <View style={styles.question}>
+                            <Text style={styles.text}>{this.props.enunciated}</Text>
+                        </View>
                     </ScrollView>
-                    <ScrollView>  
-                        <Text style={styles.text}>{this.props.question}</Text>
-                    </ScrollView>
-                </View>
-                <View style={styles.answer}>
-                    <ScrollView nestedScrollEnabled = {true}>
+                { this.props.question ? 
+                    (<ScrollView 
+                        contentContainerStyle={{flexGrow: 1}} 
+                        style={{marginBottom: 20}}> 
+                        <View style={styles.subQuestion}>
+                            <Text style={styles.text}>{this.props.question}</Text>
+                        </View>
+                     </ScrollView>
+                    ) : null
+                }
+                <ScrollView 
+                    contentContainerStyle={{flexGrow: 1}}
+                    style={{minHeight: 400}}
+                    nestedScrollEnabled = {true}>
+                    <View style={styles.answer}>
                         <View style={styles.textViewOptionMain} >
                             <Text style={styles.textOption}>Opção A</Text>
-                            <View style={styles.orderInput}>
-                                <TextInput 
-                                    style={styles.numberInput}
-                                    keyboardType='numeric'
-                                    onChangeText={orderOption1 => this.setState({ orderOption1 })}
-                                    value={this.state.orderOption1}
-                                    maxLength={1}
-                                />
-                            </View>
+                            <DropDownPicker
+                                items={[
+                                    {label: '1', value: '1'},
+                                    {label: '2', value: '2'},
+                                    {label: '3', value: '3'},
+                                    {label: '4', value: '4'},
+                                    {label: '5', value: '5'},
+                                ]}
+                                placeholder="1"
+                                defaultValue={this.state.orderOption1}
+                                containerStyle={styles.numberDropDown}
+                                style={{backgroundColor: '#fafafa'}}
+                                itemStyle={{
+                                    justifyContent: 'flex-start'
+                                }}
+                                dropDownStyle={{backgroundColor: '#fafafa'}}
+                                dropDownMaxHeight={50}
+                                onChangeItem={item => this.setState({
+                                    orderOption1: item.value
+                                })}
+                            />
                             <View style={styles.textViewOption} >
                                 <ScrollView nestedScrollEnabled = {true}>
                                     <Text>
@@ -51,15 +76,27 @@ export default class UserQuizzQO extends React.Component {
                         </View>
                         <View style={styles.textViewOptionMain} >
                             <Text style={styles.textOption}>Opção B</Text>
-                            <View style={styles.orderInput} >
-                                <TextInput 
-                                    style={styles.numberInput}
-                                    keyboardType='numeric'
-                                    onChangeText={orderOption2 => this.setState({ orderOption2 })}
-                                    value={this.state.orderOption2}
-                                    maxLength={1}
-                                />
-                            </View>
+                            <DropDownPicker
+                                items={[
+                                    {label: '1', value: '1'},
+                                    {label: '2', value: '2'},
+                                    {label: '3', value: '3'},
+                                    {label: '4', value: '4'},
+                                    {label: '5', value: '5'},
+                                ]}
+                                placeholder="1"
+                                defaultValue={this.state.orderOption2}
+                                containerStyle={styles.numberDropDown}
+                                style={{backgroundColor: '#fafafa'}}
+                                itemStyle={{
+                                    justifyContent: 'flex-start'
+                                }}
+                                dropDownStyle={{backgroundColor: '#fafafa'}}
+                                dropDownMaxHeight={50}
+                                onChangeItem={item => this.setState({
+                                    orderOption2: item.value
+                                })}
+                            />
                             <View style={styles.textViewOption} >
                                 <ScrollView nestedScrollEnabled = {true}>
                                     <Text>
@@ -70,15 +107,27 @@ export default class UserQuizzQO extends React.Component {
                         </View>
                         <View style={styles.textViewOptionMain} >
                             <Text style={styles.textOption}>Opção C</Text>
-                            <View style={styles.orderInput}>
-                                <TextInput 
-                                    style={styles.numberInput}
-                                    keyboardType='numeric'
-                                    onChangeText={orderOption3 => this.setState({ orderOption3 })}
-                                    value={this.state.orderOption3}
-                                    maxLength={1}
-                                />
-                            </View>
+                            <DropDownPicker
+                                items={[
+                                    {label: '1', value: '1'},
+                                    {label: '2', value: '2'},
+                                    {label: '3', value: '3'},
+                                    {label: '4', value: '4'},
+                                    {label: '5', value: '5'},
+                                ]}
+                                placeholder="1"
+                                defaultValue={this.state.orderOption3}
+                                containerStyle={styles.numberDropDown}
+                                style={{backgroundColor: '#fafafa'}}
+                                itemStyle={{
+                                    justifyContent: 'flex-start'
+                                }}
+                                dropDownStyle={{backgroundColor: '#fafafa'}}
+                                dropDownMaxHeight={50}
+                                onChangeItem={item => this.setState({
+                                    orderOption3: item.value
+                                })}
+                            />
                             <View style={styles.textViewOption} >
                                 <ScrollView nestedScrollEnabled = {true}>
                                     <Text>
@@ -89,15 +138,27 @@ export default class UserQuizzQO extends React.Component {
                         </View>
                         <View style={styles.textViewOptionMain} >
                             <Text style={styles.textOption}>Opção D</Text>
-                            <View style={styles.orderInput}>
-                                <TextInput 
-                                    style={styles.numberInput}
-                                    keyboardType='numeric'
-                                    onChangeText={orderOption4 => this.setState({ orderOption4 })}
-                                    value={this.state.orderOption4}
-                                    maxLength={1}
-                                />
-                            </View>
+                            <DropDownPicker
+                                items={[
+                                    {label: '1', value: '1'},
+                                    {label: '2', value: '2'},
+                                    {label: '3', value: '3'},
+                                    {label: '4', value: '4'},
+                                    {label: '5', value: '5'},
+                                ]}
+                                placeholder="1"
+                                defaultValue={this.state.orderOption4}
+                                containerStyle={styles.numberDropDown}
+                                style={{backgroundColor: '#fafafa'}}
+                                itemStyle={{
+                                    justifyContent: 'flex-start'
+                                }}
+                                dropDownStyle={{backgroundColor: '#fafafa'}}
+                                dropDownMaxHeight={50}
+                                onChangeItem={item => this.setState({
+                                    orderOption4: item.value
+                                })}
+                            />
                             <View style={styles.textViewOption} >
                                 <ScrollView nestedScrollEnabled = {true}>
                                     <Text>
@@ -108,15 +169,27 @@ export default class UserQuizzQO extends React.Component {
                         </View>
                         <View style={styles.textViewOptionMain} >
                             <Text style={styles.textOption}>Opção E</Text>
-                            <View style={styles.orderInput}>
-                                <TextInput 
-                                    style={styles.numberInput}
-                                    keyboardType='numeric'
-                                    onChangeText={orderOption5 => this.setState({ orderOption5 })}
-                                    value={this.state.orderOption5}
-                                    maxLength={1}
-                                />
-                            </View>
+                            <DropDownPicker
+                                items={[
+                                    {label: '1', value: '1'},
+                                    {label: '2', value: '2'},
+                                    {label: '3', value: '3'},
+                                    {label: '4', value: '4'},
+                                    {label: '5', value: '5'},
+                                ]}
+                                placeholder="1"
+                                defaultValue={this.state.orderOption5}
+                                containerStyle={styles.numberDropDown}
+                                style={{backgroundColor: '#fafafa'}}
+                                itemStyle={{
+                                    justifyContent: 'flex-start'
+                                }}
+                                dropDownStyle={{backgroundColor: '#fafafa'}}
+                                dropDownMaxHeight={50}
+                                onChangeItem={item => this.setState({
+                                    orderOption5: item.value
+                                })}
+                            />
                             <View style={styles.textViewOption} >
                                 <ScrollView nestedScrollEnabled = {true}>
                                     <Text>
@@ -125,8 +198,8 @@ export default class UserQuizzQO extends React.Component {
                                 </ScrollView>
                             </View>
                         </View>
-                    </ScrollView>
-                </View>
+                    </View>
+                </ScrollView>
             </View>
         );
     }
@@ -141,7 +214,7 @@ UserQuizzQO.propTypes = {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 3,
         margin: 20,
         flexDirection: 'column',
         alignSelf: 'center',
@@ -149,14 +222,17 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     question: {
+        flex: 1,
         marginBottom: 20,
-        width: 300,
-        height: 300,
+        justifyContent: 'center',
+    },
+    subQuestion: {
+        flex: 1,
+        marginBottom: 20,
         justifyContent: 'center',
     },
     answer: {
-        width: 300,
-        height: 300,
+        flex: 1,
         justifyContent: 'center',
     },
     text: {
@@ -179,22 +255,15 @@ const styles = StyleSheet.create({
     textViewOption: {
         borderColor: 'black',
         backgroundColor: 'white',
-        marginTop: -40,
+        marginTop: -50,
         marginBottom: 20,
-        marginLeft: 45,
-        marginRight: 35,
+        marginLeft: 70,
+        marginRight: 20,
         borderWidth: 2,
      },
-     orderInput: {
-        borderColor: 'black',
-        borderWidth: 3,
-        backgroundColor: 'silver',
-        width:30,
+     numberDropDown: {
+        margin: 10,
         height: 40,
-        marginLeft: 10,
-     },
-     numberInput: {
-        marginTop: -3,
-        width: 100,
-     },
+        width: 55,
+    },
 });

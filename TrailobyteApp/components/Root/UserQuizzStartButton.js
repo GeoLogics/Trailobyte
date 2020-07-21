@@ -76,7 +76,7 @@ export default class UserAreaEditButton extends React.Component {
                         {this.state.isLoading ? (
                             <Image source={spinner} style={styles.image} />
                             ) : (
-                            <Text style={styles.text}>INICIAR</Text>
+                            <Text style={styles.text}>TREINAR</Text>
                         )}
                     </TouchableOpacity>
                     <Animated.View style={[styles.circle, {transform: [{scale: changeScale}]}]}/>

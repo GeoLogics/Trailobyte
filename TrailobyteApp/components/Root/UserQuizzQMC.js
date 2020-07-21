@@ -16,16 +16,28 @@ export default class UserQuizzQMC extends React.Component {
         return (
             <View style={styles.container}>
                 <Text style={styles.text}>Questão {this.props.counter}</Text>
-                <View style={styles.question}>
-                    <ScrollView style={{marginBottom: 10}}>  
-                        <Text style={styles.text}>{this.props.enunciated}</Text>
+                    <ScrollView 
+                        contentContainerStyle={{flexGrow: 1}} 
+                        style={{marginBottom: 20}}> 
+                        <View style={styles.question}>
+                            <Text style={styles.text}>{this.props.enunciated}</Text>
+                        </View>
                     </ScrollView>
-                    <ScrollView>  
-                        <Text style={styles.text}>{this.props.question}</Text>
-                    </ScrollView>
-                </View>
-                <View style={styles.answer}>
-                    <ScrollView nestedScrollEnabled = {true}>
+                { this.props.question ? 
+                    (<ScrollView 
+                        contentContainerStyle={{flexGrow: 1}} 
+                        style={{marginBottom: 20}}> 
+                        <View style={styles.subQuestion}>
+                            <Text style={styles.text}>{this.props.question}</Text>
+                        </View>
+                     </ScrollView>
+                    ) : null
+                }
+                <ScrollView 
+                    contentContainerStyle={{flexGrow: 1}}
+                    style={{minHeight: 400}}
+                    nestedScrollEnabled = {true}>
+                    <View style={styles.answer}>
                         <RadioButton.Group
                             onValueChange={selectedOption => this.setState({ selectedOption })}
                             value={this.state.selectedOption}>
@@ -98,8 +110,8 @@ export default class UserQuizzQMC extends React.Component {
                                     </View>
                                 </View>
                         </RadioButton.Group>
-                    </ScrollView>
-                </View>
+                    </View>
+                </ScrollView>
             </View>
         );
     }
@@ -117,7 +129,7 @@ UserQuizzQMC.propTypes = {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 3,
         margin: 20,
         flexDirection: 'column',
         alignSelf: 'center',
@@ -125,14 +137,18 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     question: {
+        flex: 1,
         marginBottom: 20,
-        width: 300,
-        height: 300,
+        alignSelf: 'center',
+        justifyContent: 'center',
+    },
+    subQuestion: {
+        flex: 1,
+        marginBottom: 20,
         justifyContent: 'center',
     },
     answer: {
-        width: 300,
-        height: 300,
+        flex: 1,
         justifyContent: 'center',
     },
     text: {
