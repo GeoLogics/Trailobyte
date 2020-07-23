@@ -640,7 +640,13 @@ public class TrailResource {
 
 			while(it.hasNext()) {
 				next = it.next();
-				questionsList.get(markersList.indexOf(next.markerName)).add(next);
+				int index = markersList.indexOf(next.markerName);
+
+				if (index < 0)
+					return Response.status(Status.NO_CONTENT).entity("No questions").build();;
+
+
+					questionsList.get(index).add(next);
 			}
 
 			Random generator = new Random();
