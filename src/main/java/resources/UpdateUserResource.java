@@ -1,6 +1,5 @@
 package resources;
 
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -18,7 +17,6 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.KeyFactory;
-import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.Transaction;
 
 import util.RegisterData;
@@ -27,7 +25,6 @@ import util.RegisterData;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class UpdateUserResource {
 
-	private static final Logger LOG = Logger.getLogger(UpdateUserResource.class.getName());
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 
@@ -45,19 +42,19 @@ public class UpdateUserResource {
 		try {
 
 			Entity user = txn.get(userKey);
-	
-					user = Entity.newBuilder(userKey)
-							.set("user_pwd", user.getValue("user_pwd").get().toString())
-							.set("user_email", data.email == null ? user.getValue("user_email").get().toString() : data.email)
-							.set("user_telephone", data.telephone == null ? user.getValue("user_telephone").get().toString() : data.telephone)
-							.set("user_mobphone", data.mobilePhone == null ? user.getValue("user_mobphone").get().toString() : data.mobilePhone)
-							.set("user_address", data.address == null ? user.getValue("user_address").get().toString() : data.address)
-							.set("user_role", user.getValue("user_role").get().toString())
-							.set("user_creation_time", user.getValue("user_creation_time").get().toString())
-							.build();
-					txn.put(user);
-					txn.commit();
-		
+
+			user = Entity.newBuilder(userKey)
+					.set("user_pwd", user.getValue("user_pwd").get().toString())
+					.set("user_email", data.email == null ? user.getValue("user_email").get().toString() : data.email)
+					.set("user_telephone", data.telephone == null ? user.getValue("user_telephone").get().toString() : data.telephone)
+					.set("user_mobphone", data.mobilePhone == null ? user.getValue("user_mobphone").get().toString() : data.mobilePhone)
+					.set("user_address", data.address == null ? user.getValue("user_address").get().toString() : data.address)
+					.set("user_role", user.getValue("user_role").get().toString())
+					.set("user_creation_time", user.getValue("user_creation_time").get().toString())
+					.build();
+			txn.put(user);
+			txn.commit();
+
 			return Response.ok("{}").build();
 		}catch(Exception e) {
 			txn.rollback();

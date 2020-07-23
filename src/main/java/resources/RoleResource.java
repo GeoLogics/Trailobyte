@@ -4,14 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -25,10 +21,8 @@ import com.google.cloud.datastore.ListValue;
 import com.google.cloud.datastore.StringValue;
 import com.google.cloud.datastore.Transaction;
 import com.google.cloud.datastore.Value;
-import com.google.cloud.datastore.ValueBuilder;
 
 import DTOs.UserRoleData;
-import util.RegisterData;
 
 import com.google.cloud.datastore.Key;
 
@@ -53,17 +47,15 @@ public class RoleResource {
 		Key rolesTableKey = roleKeyFactory.newKey("roletable");
 		
 		Entity rolesTableEntity = Entity.newBuilder(rolesTableKey)
-				.set("E1", ListValue.of("T1","T3","T4","T5","T8","GQMC1","GQO1","GQTF1"))
-				.set("E2", ListValue.of("T1","T2","T3","T4","T5","T8","GQMC1","GQO1","GQTF1"))
-				.set("E3", ListValue.of("T1","T3","T4","T5","T6","T7","T8","GQMC1","GQO1","GQTF1"))
-				.set("E4", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","GQMC1","GQO1","GQTF1"))
-				.set("BO", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1"))
-				.set("BOT", ListValue.of("T1","T2","T3","T4","T5","T8"))
-				.set("BOQ", ListValue.of("T1","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1"))
-				.set("FOW", ListValue.of("T1","T3","T4","T5","T8"))
-				.set("FOA", ListValue.of("T1","T3","T4","T5","T8"))
-				.set("FO", ListValue.of("T1","T3","T4","T5","T8"))
-				.set("ADMIN", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","PQMC1","PQO1","PQTF1","GQMC1","GQO1","GQTF1","X1"))
+				.set("E1", ListValue.of("T1","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))
+				.set("E2", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","T9","GQMC1","GQO1","GQTF1"))
+				.set("BO", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","T9","PQMC1","PQO1","PQTF1","GQMC1","GQO1","GQTF1"))
+				.set("BOT", ListValue.of("T1","T2","T3","T4","T5","T7","T8","T9","GQMC1","GQO1","GQTF1"))
+				//.set("BOQ", ListValue.of("T1","T3","T4","T5","T6","T7","T8","T9","PQMC1","PQO1","PQTF1","GQMC1","GQO1","GQTF1"))
+				//.set("FOW", ListValue.of("T1","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))
+				//.set("FOA", ListValue.of("T1","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))
+				.set("FO", ListValue.of("T1","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))
+				.set("ADMIN", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","T9","PQMC1","PQO1","PQTF1","GQMC1","GQO1","GQTF1","X1","X2"))
 				.build();
 		
 		 Transaction txn = null;
@@ -92,10 +84,8 @@ public class RoleResource {
 	@PUT
 	@Path("/OPX1OP")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response changeUserRole(@Context HttpServletRequest req, UserRoleData data) {
-		String admin_authKey = req.getHeader("Authorization").split(" ")[1];
-		String admin_username = req.getHeader("username");
-	
+	public Response changeUserRole(UserRoleData data) {
+		
 		Transaction txn = null;
 		
 		if(data.role.equals("ADMIN"))
@@ -108,18 +98,18 @@ public class RoleResource {
 			txn = datastore.newTransaction();
 			//user to be changed
 			Key userKey2 = userKeyFactory.newKey(data.username);
-			Entity user2 = datastore.get(userKey2);
+			Entity user2 = txn.get(userKey2);
 
 			if( user2 != null) {
 
 				user2 = Entity.newBuilder(userKey2)
 						.set("user_pwd", user2.getString("user_pwd"))
-						.set("user_email", user2.getString("user_email"))
-						.set("user_telephone", user2.getString("user_telephone"))
-						.set("user_mobphone", user2.getString("user_mobphone"))
-						.set("user_address", user2.getString("user_address"))
+						.set("user_email", user2.getString("user_email") == null ? "" : user2.getString("user_email"))
+						.set("user_telephone", user2.getString("user_telephone") == null ? "" : user2.getString("user_telephone"))
+						.set("user_mobphone", user2.getString("user_mobphone") == null ? "" : user2.getString("user_mobphone"))
+						.set("user_address", user2.getString("user_address") == null ? "" : user2.getString("user_address"))
 						.set("user_role", data.role)
-						.set("user_creation_time", user2.getTimestamp("user_creation_time"))
+						.set("user_creation_time", user2.getValue("user_creation_time").get().toString())
 						.build();
 
 				txn.put(user2);
@@ -129,10 +119,8 @@ public class RoleResource {
 			return Response.status(Status.NOT_FOUND).entity("User does not exist.").build();	
 			
 		}catch(Exception e) {
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		}finally {
-			if(txn.isActive())
 				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 	

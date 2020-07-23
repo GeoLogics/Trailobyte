@@ -14,7 +14,6 @@ public class Utils {
 	
 	private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 	private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
-	private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 
 	public Utils() { }
 	
