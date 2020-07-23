@@ -50,7 +50,7 @@ public class RoleResource {
 				.set("E1", ListValue.of("T1","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))
 				.set("E2", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","T9","GQMC1","GQO1","GQTF1"))
 				.set("BO", ListValue.of("T1","T2","T3","T4","T5","T6","T7","T8","T9","PQMC1","PQO1","PQTF1","GQMC1","GQO1","GQTF1"))
-				.set("BOT", ListValue.of("T1","T2","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))
+				.set("BOT", ListValue.of("T1","T2","T3","T4","T5","T7","T8","T9","GQMC1","GQO1","GQTF1"))
 				//.set("BOQ", ListValue.of("T1","T3","T4","T5","T6","T7","T8","T9","PQMC1","PQO1","PQTF1","GQMC1","GQO1","GQTF1"))
 				//.set("FOW", ListValue.of("T1","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))
 				//.set("FOA", ListValue.of("T1","T3","T4","T5","T8","T9","GQMC1","GQO1","GQTF1"))

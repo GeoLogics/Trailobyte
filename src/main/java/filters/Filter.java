@@ -41,13 +41,25 @@ public class Filter implements ContainerRequestFilter, ContainerResponseFilter{
 		if(!path.equals("login/v1")&&!path.equals("register/v1")&&!path.contains("OPT3OP")&&!path.equals("query/byUser")&&
 				!path.equals("query/byRating")&&!path.equals("query/rankings")&&!path.equals("query/cacheUpdate")/*&&!path.equals("query/listUsers")&&!path.equals("query/listTrails")&&!path.equals("query/listTrailsUnverified")*/) { 
 
+			String authKey = requestContext.getHeaderString("Authorization");
 
-			String authKey = requestContext.getHeaderString("Authorization").split(" ")[1];
+			if(authKey==null) {
+				
+				throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity("No key").build());
+			}
+			else {
+				authKey = authKey.split(" ")[1];
+			}
+			
 			String username = requestContext.getHeaderString("username");
 
-			try {//mudar codigo de erro para reiniciar app
+			if(username==null)
+				throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity("No username").build());
+			
+
+			try {//mudar codigo de erro para reiniciar app 406?
 				if(!cache.Authentication(authKey, username))
-					throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity("User: " + username + " does not have a valid session key.").build());
+					throw new WebApplicationException(Response.status(Status.NOT_ACCEPTABLE).entity("User: " + username + " does not have a valid session key.").build());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

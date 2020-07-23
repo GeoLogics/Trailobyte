@@ -586,13 +586,19 @@ public class TrailResource {
 	@Path("/OPT7OP")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUnverifiedQuestions(@Context HttpServletRequest req, @Context HttpServletResponse res,  QueryData queryData /*@PathParam("trailName")String trailName*/) throws FileUploadException, IOException  {
+	public Response getUnverifiedQuestions(QueryData queryData /*@PathParam("trailName")String trailName*/) throws FileUploadException, IOException  {
 
 		/*if(trailName == null) 
 			return Response.status(Status.BAD_REQUEST).entity("null trailName").build();*/
 
 		try {
-			return Response.ok(g.toJson(queries.queryTrailUnverifiedQuestions(queryData, /*trailName*/null))).build();		
+			if(queryData != null)
+				return Response.ok(g.toJson(queries.queryTrailUnverifiedQuestions(queryData, /*trailName*/null))).build();		
+
+			else {
+				QueryData newQueryData = new QueryData(null, null, null);
+				return Response.ok(g.toJson(queries.queryTrailUnverifiedQuestions(newQueryData, /*trailName*/null))).build();
+			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();

@@ -86,8 +86,8 @@ public class CacheResource {
 
 
 		if(authKey.equals(verifier))  {
-			if(System.currentTimeMillis() < expirationDate) {//refresh da sessao cada vez q se faz 1 pedido - 1 hora 1000*60*60
-				syncCache.put(cacheKey, g.toJson(new CacheToken(System.currentTimeMillis()+1000*60*60*24*7, verifier)).getBytes());
+			if(System.currentTimeMillis() < expirationDate) {//refresh da sessao cada vez q se faz 1 pedido - 1000*60*60*24*7 7 dias
+				syncCache.put(cacheKey, g.toJson(new CacheToken(System.currentTimeMillis()+1000*60*30, verifier)).getBytes());
 				System.out.println("XD2");
 				return true;
 

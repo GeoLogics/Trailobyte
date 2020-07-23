@@ -323,6 +323,10 @@ public class QueryResource {
 
 		if(queryData.pageSize == null)
 			queryData.pageSize = 10;
+		
+		if(queryData.param==null) {
+			return Response.status(Status.BAD_REQUEST).build();	 	
+		}
 
 		EntityQuery.Builder queryBuilder = Query.newEntityQueryBuilder()
 				.setKind("Review")

@@ -4,8 +4,8 @@ import java.util.UUID;
 
 public class CacheToken {
 	
-	//public static final long EXPIRATION_TIME = 1000*60*60; //1h
-	public static final long EXPIRATION_TIME = 1000*60*60*24*7; //7 dias
+	public static final long EXPIRATION_TIME = 1000*60*30; //30 mins
+	//public static final long EXPIRATION_TIME = 1000*60*60*24*7; //7 dias
 	public long expirationDate;
 	public String verifier;
 	
